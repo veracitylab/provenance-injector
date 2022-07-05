@@ -3,7 +3,6 @@ package nz.ac.wgtn.veracity.provenance.injector.jee.rt;
 import java.io.ByteArrayOutputStream;
 
 import shadow.com.cedarsoftware.util.io.JsonWriter;
-
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,16 +39,6 @@ public class JSONEncoder implements Encoder {
             String key = kind.name();
             out.print("\t\"");
             out.print(key);
-            if (key.equals("taintFlows")) {
-                out.print("\":");
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                Map args = new HashMap();
-                args.put(JsonWriter.TYPE, false);
-                JsonWriter jw = new JsonWriter(bos, args);       // optional 2nd 'options' argument (see below)
-                jw.write(data.get(kind));
-                out.write(new String(bos.toByteArray(), java.nio.charset.StandardCharsets.UTF_8));
-                continue;
-            }
             out.print("\":[");
             List values = data.get(kind);
             if (values==null) values = Collections.emptyList();
