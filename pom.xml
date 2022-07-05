@@ -35,6 +35,27 @@
                   </execution>
               </executions>
           </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-shade-plugin</artifactId>
+              <version>3.3.0</version>
+              <configuration>
+                  <relocations>
+                      <relocation>
+                          <pattern>org.json</pattern>
+                          <shadedPattern>shaded.org.json</shadedPattern>
+                      </relocation>
+                  </relocations>
+              </configuration>
+              <executions>
+                  <execution>
+                      <phase>package</phase>
+                      <goals>
+                          <goal>shade</goal>
+                      </goals>
+                  </execution>
+              </executions>
+          </plugin>
       </plugins>
   </build>
   <dependencies>
@@ -75,8 +96,7 @@
       <dependency>
           <groupId>org.json</groupId>
           <artifactId>json</artifactId>
-          <version>20200518</version>
-          <scope>test</scope>
+          <version>20220320</version>
       </dependency>
   </dependencies>
 </project>
