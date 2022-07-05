@@ -47,35 +47,16 @@ public class ProvenancePickupServlet extends HttpServlet {
         while (id.startsWith("/")) {
             id = id.substring(1);
         }
-        // request.getServletContext().log("TrackedInvocationsPickupServlet -- normalised id: " + id);
 
-        if (Constants.SYSTEM_INVOCATIONS_TICKET.equals(id))  {
-            String applicationPackagePrefixes = request.getParameter(Constants.SYSTEM_INVOCATIONS_APPLICATION_PACKAGE_PREFIXES_PARAMETER);
-            if (applicationPackagePrefixes==null) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Missing request parameter: " + Constants.SYSTEM_INVOCATIONS_APPLICATION_PACKAGE_PREFIXES_PARAMETER);
-            }
-            else {
-                Set<String> invocations = SystemInvocationTracker.getTrackedInvocations(applicationPackagePrefixes);
-                response.setContentType("text/plain");
-                PrintWriter out = response.getWriter();
-                for (String invocation:invocations) {
-                    out.println(invocation);
-                }
-                out.close();
-            }
+        Map<DataKind, List<Object>> tracked = InvocationTracker.DEFAULT.pickup(id);
+        if (tracked == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
-
-        else {
-            Map<DataKind, List<Object>> tracked = InvocationTracker.DEFAULT.pickup(id);
-            if (tracked == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
-            response.setContentType(Encoder.DEFAULT.getContentType());
-            PrintWriter out = response.getWriter();
-            Encoder.DEFAULT.encode(tracked, out);
-            out.close();
-        }
+        response.setContentType(Encoder.DEFAULT.getContentType());
+        PrintWriter out = response.getWriter();
+        Encoder.DEFAULT.encode(tracked, out);
+        out.close();
     }
 
 
