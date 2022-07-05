@@ -4,7 +4,7 @@ This project contains the logic to track method invocations that can be mapped t
 
 
 
-### Design and How to Use
+### Design
 
 1. the application is instrumented at loadtime time using *aspect-j* 
 2. the injected code tracks invocations by logging them using an `InvocationTracker` -- this is basically a simple in-memory database
