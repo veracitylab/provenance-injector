@@ -4,7 +4,7 @@
   <groupId>nz.ac.wgtn.veracity</groupId>
   <artifactId>provenance-injector</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <name>provenance-injector</name>
   <url>http://maven.apache.org</url>
   <properties>
