@@ -1,7 +1,6 @@
 package nz.ac.wgtn.veracity.provenance.injector.jee.instrumentation;
 
-import nz.ac.wgtn.veracity.provenance.injector.jee.rt.DataKind;
-import nz.ac.wgtn.veracity.provenance.injector.jee.rt.Util;
+import nz.ac.wgtn.veracity.provenance.InstrumentationUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Before;
@@ -9,10 +8,6 @@ import org.aspectj.lang.reflect.ConstructorSignature;
 import org.aspectj.lang.reflect.MethodSignature;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.List;
 
 /**
  * Aspect to record calls of interest.
@@ -20,7 +15,7 @@ import java.util.List;
  */
 public aspect MethodInvocationTracking {
 
-    @Before("execution(* *.*(..)) && !within(nz.ac.wgtn.veracity.provenance.injector.jee.rt.*) && !within(nz.ac.wgtn.veracity.provenance.injector.jee.instrumentation.*)")
+    @Before("execution(* *.*(..)) && !within(nz.ac.wgtn.veracity.provenance..*)")
     public void trackUnsafeSystemSinks(JoinPoint joinPoint) {
         System.out.println("TRACKING: " + joinPoint);
         Signature signature = joinPoint.getSignature();
@@ -28,8 +23,8 @@ public aspect MethodInvocationTracking {
         Method method = methodSignature.getMethod();
         String className = method.getDeclaringClass().getName();
         String methodName = method.getName();
-        String descr = Util.getDescriptor(method);
-        nz.ac.wgtn.veracity.provenance.injector.jee.rt.InvocationTracker.DEFAULT.track(DataKind.invokedMethods,className + "::"+ methodName + descr);
-    }
+        String descr = InstrumentationUtil.getDescriptor(method);
 
+        InstrumentationUtil.trackMethodInvocation(className,methodName,descr);
+    }
 }

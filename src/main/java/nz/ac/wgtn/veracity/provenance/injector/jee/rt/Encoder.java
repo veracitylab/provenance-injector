@@ -1,5 +1,7 @@
 package nz.ac.wgtn.veracity.provenance.injector.jee.rt;
 
+import nz.ac.wgtn.veracity.provenance.ProvenanceEvent;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -15,5 +17,5 @@ public interface Encoder {
 
     String getContentType();
 
-    void encode(Map<DataKind, List<Object>> data, PrintWriter out) throws IOException;
+    void encode(List<ProvenanceEvent> data, PrintWriter out) throws IOException;
 }

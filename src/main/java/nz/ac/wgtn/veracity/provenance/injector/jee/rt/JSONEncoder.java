@@ -1,5 +1,8 @@
 package nz.ac.wgtn.veracity.provenance.injector.jee.rt;
 
+import nz.ac.wgtn.veracity.provenance.ProvenanceEvent;
+import nz.ac.wgtn.veracity.provenance.ProvenanceKind;
+import nz.ac.wgtn.veracity.provenance.ProvenanceLocationKind;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.PrintWriter;
@@ -16,51 +19,38 @@ public class JSONEncoder implements Encoder {
         return "application/json";
     }
 
-    public void encode(Map<DataKind, List<Object>> data, PrintWriter out) {
+    public static final String KEY_KIND = "kind";
+    public static final String KEY_LOCATION_KIND = "locationKind";
+    public static final String KEY_LOCATION = "location";
 
-        JSONObject json = new JSONObject();  // check whether we can just use json.put(new JSONObject(data));
-        for (DataKind kind:data.keySet()) {
-            String key = kind.name();
-            List values = data.get(kind);
-            if (values==null) values = Collections.emptyList();
-            json.put(key,new JSONArray(values));
+    public void encode(List<ProvenanceEvent> data, PrintWriter out) {
+        JSONArray array = new JSONArray();
+        for (ProvenanceEvent event:data) {
+            JSONObject obj = new JSONObject();
+            obj.put(KEY_KIND,event.getKind().toString());
+            obj.put(KEY_LOCATION_KIND,event.getLocationKind().toString());
+            JSONObject location = new JSONObject(event.getLocation());
+            obj.put(KEY_LOCATION,location);
+            array.put(obj);
         }
-        out.println(json);
-//        out.println("{");
-//        boolean f1 = true;
-//        for (DataKind kind:data.keySet()) {
-//            if (f1) {
-//                f1 = false;
-//            }
-//            else {
-//                out.print(',');
-//            }
-//            String key = kind.name();
-//            out.print("\t\"");
-//            out.print(key);
-//            out.print("\":[");
-//            List values = data.get(kind);
-//            if (values==null) values = Collections.emptyList();
-//            boolean f2 = true;
-//            for (Object value:values) {
-//                if (f2) {
-//                    f2 = false;
-//                }
-//                else {
-//                    out.print(',');
-//                }
-//                if (value instanceof Map) {
-//                    out.print(flatten(value));
-//                } else {
-//                    out.print('\"');
-//                    out.print(flatten(value));  // assume that we do not have to sanitise this, TODO !
-//                    out.print('\"');
-//                }
-//            }
-//            out.print("]");
-//        }
-//        out.println("}");
+        out.println(array);
+    }
 
+    // Utility to be used for testing, keep here for consistenct
+    public static ProvenanceEvent decodeObject(JSONObject obj) {
+        ProvenanceEvent event = new ProvenanceEvent();
+        event.setKind(ProvenanceKind.valueOf(obj.getString(KEY_KIND)));
+        event.setLocationKind(ProvenanceLocationKind.valueOf(obj.getString(KEY_LOCATION_KIND)));
+        event.setLocation(obj.getJSONObject(KEY_LOCATION).toMap());
+        return event;
+    }
+
+    public static List<ProvenanceEvent> decodeArray(JSONArray arr) {
+        List<ProvenanceEvent> events = new ArrayList<>(arr.length());
+        for (int i=0;i<arr.length();i++) {
+            events.add(decodeObject(arr.getJSONObject(i)));
+        }
+        return events;
     }
 
     private static String flatten(Object value) {

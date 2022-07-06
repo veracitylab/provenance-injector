@@ -1,5 +1,7 @@
 package nz.ac.wgtn.veracity.provenance.injector.jee.rt;
 
+import nz.ac.wgtn.veracity.provenance.ProvenanceEvent;
+
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -16,7 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class ThreadLocalInvocationTracker extends InvocationTracker {
 
-    private ThreadLocal<Map<DataKind,List<Object>>> trackedData = new ThreadLocal<>();
+    private ThreadLocal<List<ProvenanceEvent>> trackedData = new ThreadLocal<>();
     private ThreadLocal<String> id = new ThreadLocal<>();
 
     public static final int MAX_OUTBOX_SIZE = 10_000;
@@ -25,7 +27,7 @@ public class ThreadLocalInvocationTracker extends InvocationTracker {
     // when the request handling ends, recorded method (specs) are moved into a special pool,
     // waiting to be picked up
     // TODO: timeout mechanism to avoid memory leaks
-    private Map<String,Map<DataKind,List<Object>>> outbox = null;
+    private Map<String,List<ProvenanceEvent>> outbox = null;
 
     public ThreadLocalInvocationTracker() {
         // use data structure that allows eviction of old data once a certain max size is exceeded
@@ -39,23 +41,23 @@ public class ThreadLocalInvocationTracker extends InvocationTracker {
     public String startInvocationTracking() {
         String ID = "" + ID_GENERATOR.incrementAndGet();
         this.id.set(ID);
-        this.trackedData.set(new HashMap<>());
+        this.trackedData.set(new ArrayList<>());
         return ID;
     }
 
     @Override
-    public void track(DataKind kind, Object data) {
+    public void track(ProvenanceEvent data) {
 
         // if (kind==DataKind.exceptions) System.out.println("Tracking " + kind + " -- " + data);
-        Map<DataKind,List<Object>> tracked = trackedData.get();
+        List<ProvenanceEvent> tracked = trackedData.get();
         if (tracked!=null) { // can be null if invocation happens outside request handling
-            List<Object> trackedForThisKind = tracked.computeIfAbsent(kind, k -> new ArrayList<>());
-            if (!trackedForThisKind.contains(data)) // TODO: turn List<Object> to Set<Object>?
-                trackedForThisKind.add(data);
+            if (!tracked.contains(data)) // TODO: turn List<Object> to Set<Object>?
+                tracked.add(data);
         }
-        if (tracked==null && kind==DataKind.invokedMethods) {
-            SystemInvocationTracker.trackSystemInvocation((String)data);
-        }
+        // TODO: discuss whether to do this -- will shift FP/FN ratio
+//        if (tracked==null && kind==DataKind.invokedMethods) {
+//            SystemInvocationTracker.trackSystemInvocation((String)data);
+//        }
     }
 
     @Override
@@ -74,14 +76,14 @@ public class ThreadLocalInvocationTracker extends InvocationTracker {
             }
         }
 
-        this.outbox.put(id.get(),Collections.unmodifiableMap(trackedData.get()));
+        this.outbox.put(id.get(),Collections.unmodifiableList(trackedData.get()));
         this.trackedData.set(null);
 
     }
 
     // pick up the logs, clear memory
     @Override
-    public Map<DataKind,List<Object>> pickup(String id) {
+    public List<ProvenanceEvent> pickup(String id) {
         //System.out.println("InvocationTracker:\tInvocationTracker:\t Pickup " + id);
         return outbox.remove(id);
     }
