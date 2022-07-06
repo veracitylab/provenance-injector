@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <aspectj>
     <aspects>
-        <aspect name="nz.ac.wgtn.veracity.provenance.injector.jee.rt.instrumentation.MethodInvocationTracking"/>
+        <aspect name="nz.ac.wgtn.veracity.provenance.injector.jee.instrumentation.MethodInvocationTracking"/>
     </aspects>
 
     <weaver options="-verbose">
