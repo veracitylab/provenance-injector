@@ -88,18 +88,18 @@ public class ServletWithInternalInvocationsTest {
         assertEquals(2,events.size());
 
         assertTrue(events.stream()
-                .filter(e -> e.getKind()==ProvenanceKind.DATABASE_WRITE)
-                .filter(e -> e.getLocationKind()== ProvenanceLocationKind.METHOD)
-                .filter(e -> e.getLocation().get("className").equals(ServletWithInternalInvocations.class.getName()))
-                .filter(e -> e.getLocation().get("methodName").equals("foo1"))
-                .anyMatch(e -> e.getLocation().get("descriptor").equals("()V")));
+            .filter(e -> e.getKind()==ProvenanceKind.DATABASE_WRITE)
+            .filter(e -> e.getLocationKind()== ProvenanceLocationKind.METHOD)
+            .filter(e -> e.getLocation().get("className").equals(ServletWithInternalInvocations.class.getName()))
+            .filter(e -> e.getLocation().get("methodName").equals("foo1"))
+            .anyMatch(e -> e.getLocation().get("descriptor").equals("()V")));
 
         assertTrue(events.stream()
-                .filter(e -> e.getKind()==ProvenanceKind.NETWORK_WRITE)
-                .filter(e -> e.getLocationKind()== ProvenanceLocationKind.METHOD)
-                .filter(e -> e.getLocation().get("className").equals(ServletWithInternalInvocations.class.getName()))
-                .filter(e -> e.getLocation().get("methodName").equals("foo2"))
-                .anyMatch(e -> e.getLocation().get("descriptor").equals("()V")));
+            .filter(e -> e.getKind()==ProvenanceKind.NETWORK_WRITE)
+            .filter(e -> e.getLocationKind()== ProvenanceLocationKind.METHOD)
+            .filter(e -> e.getLocation().get("className").equals(ServletWithInternalInvocations.class.getName()))
+            .filter(e -> e.getLocation().get("methodName").equals("foo2"))
+            .anyMatch(e -> e.getLocation().get("descriptor").equals("()V")));
 
 //        assertTrue(specs.stream()
 //                .filter(m -> m.getClassName().equals("test.testdata.nz.ac.wgtn.veracity.provenance.injector.jee.ServletWithInternalInvocations"))

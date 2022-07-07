@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Test subject. Keep it testdata namespace to avoid instrumentation exclusions.
@@ -17,10 +18,13 @@ public class ServletWithInternalInvocations extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 
-    private void foo1() {
+    private void foo1() throws IOException {
         foo2();
     }
 
-    private void foo2() {
+    private void foo2() throws IOException {
+        // call to some external URL
+        URL url = new URL("http://foo.com");
+        url.openConnection();
     }
 }

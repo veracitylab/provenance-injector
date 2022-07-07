@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 public aspect MethodInvocationTracking {
 
     @Before("execution(* *.*(..)) && !within(nz.ac.wgtn.veracity.provenance..*)")
-    public void trackUnsafeSystemSinks(JoinPoint joinPoint) {
+    public void trackMethodInvocation(JoinPoint joinPoint) {
         System.out.println("TRACKING: " + joinPoint);
         Signature signature = joinPoint.getSignature();
         MethodSignature methodSignature = (MethodSignature) signature;
@@ -26,5 +26,18 @@ public aspect MethodInvocationTracking {
         String descr = InstrumentationUtil.getDescriptor(method);
 
         InstrumentationUtil.trackMethodInvocation(className,methodName,descr);
+    }
+
+
+    @Before("execution(*.new(..)) && !within(nz.ac.wgtn.veracity.provenance..*)")
+    public void trackConstructorInvocation(JoinPoint joinPoint) {
+        System.out.println("TRACKING: " + joinPoint);
+        Signature signature = joinPoint.getSignature();
+        ConstructorSignature constructorSignature = (ConstructorSignature) signature;
+        Constructor constructor = constructorSignature.getConstructor();
+        String className = constructor.getDeclaringClass().getName();
+        String descr = InstrumentationUtil.getDescriptor(constructor);
+
+        InstrumentationUtil.trackMethodInvocation(className,"<init>",descr);
     }
 }
