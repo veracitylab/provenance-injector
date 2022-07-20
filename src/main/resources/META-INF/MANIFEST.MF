@@ -1,2 +1,2 @@
-Premain-Class: nz.ac.wgtn.veracity.provenance.injector.ProvenanceAgent
+Premain-Class: nz.ac.wgtn.veracity.provenance.injector.instrumentation.ProvenanceAgent
 Can-Retransform-Classes: true

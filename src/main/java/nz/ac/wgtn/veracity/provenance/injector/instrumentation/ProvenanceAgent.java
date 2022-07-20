@@ -1,21 +1,21 @@
-package nz.ac.wgtn.veracity.provenance.injector;
+package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
 import net.bytebuddy.agent.builder.*;
-import net.bytebuddy.asm.Advice;
+import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
+import nz.ac.wgtn.veracity.provenance.injector.ProvenanceBinding;
+import nz.ac.wgtn.veracity.provenance.injector.ProvenanceKind;
 
-import java.io.IOException;
 import java.lang.instrument.Instrumentation;
-import java.lang.reflect.Method;
-import java.util.jar.JarFile;
+import java.util.EnumSet;
 
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public class ProvenanceAgent {
 
-    private static final String AGENT_PACKAGE = ProvenanceAgent.class.getPackageName();
+    private static final String AGENT_PACKAGE = "nz.ac.wgtn.veracity.provenance.";
     private static final String BYTEBUDDY_PACKAGE = "net.bytebuddy.";
     private static final ElementMatcher.Junction<TypeDescription> IGNORED_TYPES =
             nameStartsWith(AGENT_PACKAGE)
@@ -57,6 +57,11 @@ public class ProvenanceAgent {
                     .or(nameMatches(".*[.]instrument[.].*"))
                     .or(nameMatches("java[.]io[.].*Writer"))
                     .or(nameMatches("java[.]net[.]URL.*"));
+
+    private static final ElementMatcher.Junction<MethodDescription> ALLOWED_METHODS = any()
+            .and(not(ElementMatchers.isConstructor()))
+            .and(not(ElementMatchers.isStatic()));
+
     /**
      * Allows installation of java agent from command line.
      *
@@ -83,7 +88,20 @@ public class ProvenanceAgent {
         install(instrumentation);
     }
 
+    /**
+     * Installs the agent and sets up the provenance bindings.
+     * @param instrumentation
+     *          instrumentation instance
+     */
     private static void install(Instrumentation instrumentation) {
+        new ProvenanceBinding() {
+            @Override
+            public EnumSet<ProvenanceKind> inferProvenanceKindFromMethodInvocation(String declaringClass, String methodName, String descriptor) {
+                // TODO: Set some sensible bindings here.
+                return EnumSet.of(ProvenanceKind.NONE);
+
+            }
+        }.install();
         createAgent().installOn(instrumentation);
     }
 
@@ -95,22 +113,13 @@ public class ProvenanceAgent {
                 .with(AgentBuilder.RedefinitionStrategy.Listener.StreamWriting.toSystemError())
                 .with(AgentBuilder.Listener.StreamWriting.toSystemError())
                 .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
-//                .with(AgentBuilder.RedefinitionStrategy.DiscoveryStrategy.Reiterating.INSTANCE)
-//                .with(AgentBuilder.InitializationStrategy.NoOp.INSTANCE)
-//                .with(AgentBuilder.LambdaInstrumentationStrategy.ENABLED)
-
-//                .with(AgentBuilder.TypeStrategy.Default.REBASE)
                 .ignore(IGNORED_TYPES)
                 .type(any())
-//                .type(nameStartsWith("nz.ac.canterbury.dataprovenancedemo.controllers.LibraryController"))
+                // Include classloader to ensure all types are instrumented
                 .transform(new AgentBuilder.Transformer.ForAdvice()
-//                        .include(ProvenanceAgent.class.getClassLoader())
                         .include(Thread.currentThread().getContextClassLoader())
-
-//                        .advice(any().and(not(ElementMatchers.isConstructor())), "nz.ac.wgtn.veracity.provenance.injector.ProvenanceAdvice"));
-                        .advice(any().and(not(ElementMatchers.isConstructor())).and(not(ElementMatchers.isStatic())), "nz.ac.wgtn.veracity.provenance.injector.ProvenanceAdvice"));
-//                .transform((builder, typeDescription, classLoader, javaModule) -> builder.visit(Advice.to(ProvenanceAdvice.class).on(
-//                        any())));
+                        // TODO: Add advice for constructors, static methods
+                        .advice(ALLOWED_METHODS, "nz.ac.wgtn.veracity.provenance.injector.instrumentation.ProvenanceAdvice"));
     }
 
 }

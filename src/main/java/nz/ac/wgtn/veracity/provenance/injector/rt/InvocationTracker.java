@@ -1,7 +1,8 @@
 package nz.ac.wgtn.veracity.provenance.injector.rt;
 
+import nz.ac.wgtn.veracity.provenance.injector.ProvenanceEvent;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -29,13 +30,13 @@ public abstract class InvocationTracker {
      */
     public abstract void finishInvocationTracking() ;
 
-    public abstract void track(DataKind kind,Object data) ;
+    public abstract void track(ProvenanceEvent data) ;
 
 
     /**
      * Pick up the invocation logs, logs for this id should be cleared.
      */
-    public abstract Map<DataKind,List<Object>> pickup(String id);
+    public abstract List<ProvenanceEvent> pickup(String id);
 
     public abstract Set<String> getAvailableTickets() ;
 

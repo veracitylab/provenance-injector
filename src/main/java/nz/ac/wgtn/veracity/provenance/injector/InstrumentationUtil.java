@@ -1,13 +1,38 @@
-package nz.ac.wgtn.veracity.provenance.injector.rt;
+package nz.ac.wgtn.veracity.provenance.injector;
+
+import nz.ac.wgtn.veracity.provenance.injector.rt.InvocationTracker;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Utilities.
+ * Instrumentation-related utilities.
  * @author jens dietrich
  */
-public class Util {
+public class InstrumentationUtil {
+
+    public static void trackMethodInvocation(String className, String  methodName, String descriptor) {
+        EnumSet<ProvenanceKind> kind = ProvenanceBinding.DEFAULT.inferProvenanceKindFromMethodInvocation(className,methodName,descriptor);
+        if (kind.size()>0) {
+            // TODO: Reenable this when we have a proper provenance event model.
+//            if (kind.size()>1 || !kind.contains(ProvenanceKind.NONE)) {
+                Map<String,Object> location = new HashMap<>();
+                location.put("className",className);
+                location.put("methodName",methodName);
+                location.put("descriptor",descriptor);
+                for (ProvenanceKind k:kind) {
+                    ProvenanceEvent event = new ProvenanceEvent();
+                    event.setLocation(location);
+                    event.setLocationKind(ProvenanceLocationKind.METHOD);
+                    event.setKind(k);
+                    InvocationTracker.DEFAULT.track(event);
+                }
+//            }
+        }
+    }
 
     static boolean isArray(Object obj) {
         return obj!=null && obj.getClass().isArray();
@@ -58,5 +83,4 @@ public class Util {
         }
         else return "L" + cl.getName().replace('.','/') + ";";
     }
-
 }

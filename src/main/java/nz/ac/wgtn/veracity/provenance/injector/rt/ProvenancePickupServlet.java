@@ -1,12 +1,13 @@
 package nz.ac.wgtn.veracity.provenance.injector.rt;
 
+import nz.ac.wgtn.veracity.provenance.injector.ProvenanceEvent;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +48,7 @@ public class ProvenancePickupServlet extends HttpServlet {
             id = id.substring(1);
         }
 
-        Map<DataKind, List<Object>> tracked = InvocationTracker.DEFAULT.pickup(id);
+        List<ProvenanceEvent> tracked = InvocationTracker.DEFAULT.pickup(id);
         if (tracked == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
