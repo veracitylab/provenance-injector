@@ -1,13 +1,14 @@
 package nz.ac.wgtn.veracity.provenance.injector;
 
+import nz.ac.wgtn.veracity.provenance.injector.model.ProvenanceEvent;
+import nz.ac.wgtn.veracity.provenance.injector.model.ProvenanceKind;
+import nz.ac.wgtn.veracity.provenance.injector.model.ProvenanceLocationKind;
 import nz.ac.wgtn.veracity.provenance.injector.rt.InvocationTracker;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
+import java.util.*;
 /**
  * Instrumentation-related utilities.
  * @author jens dietrich

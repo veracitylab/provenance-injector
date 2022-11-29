@@ -5,11 +5,13 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-import nz.ac.wgtn.veracity.provenance.injector.ProvenanceBinding;
-import nz.ac.wgtn.veracity.provenance.injector.ProvenanceKind;
 
+import java.lang.instrument.ClassFileTransformer;
+import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
-import java.util.EnumSet;
+import java.security.ProtectionDomain;
+import java.util.HashSet;
+import java.util.Set;
 
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
@@ -94,15 +96,16 @@ public class ProvenanceAgent {
      *          instrumentation instance
      */
     private static void install(Instrumentation instrumentation) {
-        new ProvenanceBinding() {
-            @Override
-            public EnumSet<ProvenanceKind> inferProvenanceKindFromMethodInvocation(String declaringClass, String methodName, String descriptor) {
-                // TODO: Set some sensible bindings here.
-                return EnumSet.of(ProvenanceKind.NONE);
-
-            }
-        }.install();
-        createAgent().installOn(instrumentation);
+//        new ProvenanceBinding() {
+//            @Override
+//            public EnumSet<ProvenanceKind> inferProvenanceKindFromMethodInvocation(String declaringClass, String methodName, String descriptor) {
+//                // TODO: Set some sensible bindings here.
+//                return EnumSet.of(ProvenanceKind.NONE);
+//
+//            }
+//        }.install();
+//        createAgent().installOn(instrumentation);
+        instrumentation.addTransformer(new ClassLoadTransformer(), true);
     }
 
     private static AgentBuilder createAgent() {

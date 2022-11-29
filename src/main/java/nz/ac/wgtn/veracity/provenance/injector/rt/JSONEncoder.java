@@ -1,8 +1,8 @@
 package nz.ac.wgtn.veracity.provenance.injector.rt;
 
-import nz.ac.wgtn.veracity.provenance.injector.ProvenanceEvent;
-import nz.ac.wgtn.veracity.provenance.injector.ProvenanceKind;
-import nz.ac.wgtn.veracity.provenance.injector.ProvenanceLocationKind;
+import nz.ac.wgtn.veracity.provenance.injector.model.ProvenanceEvent;
+import nz.ac.wgtn.veracity.provenance.injector.model.ProvenanceKind;
+import nz.ac.wgtn.veracity.provenance.injector.model.ProvenanceLocationKind;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

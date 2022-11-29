@@ -1,6 +1,6 @@
 package nz.ac.wgtn.veracity.provenance.injector.rt;
 
-import nz.ac.wgtn.veracity.provenance.injector.ProvenanceEvent;
+import nz.ac.wgtn.veracity.provenance.injector.model.ProvenanceEvent;
 
 import java.util.List;
 import java.util.Set;

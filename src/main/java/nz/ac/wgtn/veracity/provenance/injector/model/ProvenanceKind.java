@@ -1,4 +1,4 @@
-package nz.ac.wgtn.veracity.provenance.injector;
+package nz.ac.wgtn.veracity.provenance.injector.model;
 
 /**
  * Simple hard coded ontology of things to observe.

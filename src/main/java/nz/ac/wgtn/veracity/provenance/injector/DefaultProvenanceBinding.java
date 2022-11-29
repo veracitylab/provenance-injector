@@ -1,5 +1,7 @@
 package nz.ac.wgtn.veracity.provenance.injector;
 
+import nz.ac.wgtn.veracity.provenance.injector.model.ProvenanceKind;
+
 import java.util.EnumSet;
 
 /**

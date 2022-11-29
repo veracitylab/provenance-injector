@@ -1,5 +1,7 @@
 package nz.ac.wgtn.veracity.provenance.injector;
 
+import nz.ac.wgtn.veracity.provenance.injector.model.ProvenanceKind;
+
 import java.util.EnumSet;
 
 /**
@@ -15,7 +17,7 @@ public abstract class ProvenanceBinding {
         DEFAULT = this;
     }
 
-    public EnumSet<ProvenanceKind> inferProvenanceKindFromMethodInvocation (String declaringClass,String methodName,String descriptor) {
+    public EnumSet<ProvenanceKind> inferProvenanceKindFromMethodInvocation (String declaringClass, String methodName, String descriptor) {
         return EnumSet.of(ProvenanceKind.NONE);
     }
 
