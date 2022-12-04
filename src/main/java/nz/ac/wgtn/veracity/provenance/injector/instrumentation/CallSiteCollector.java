@@ -1,15 +1,17 @@
 package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class CallSiteCollector {
     private static CallSiteCollector instance = null;
 
-    private final Map<String, Collection<String>> callsites;
+    private final ConcurrentMap<String, Collection<String>> callsites;
 
 
     private CallSiteCollector() {
-        this.callsites = new HashMap<>();
+        this.callsites = new ConcurrentHashMap<>();
     }
 
     public static synchronized CallSiteCollector getInstance() {
@@ -22,8 +24,8 @@ public class CallSiteCollector {
 
     public synchronized void addCallSites(String className, Collection<String> sitesToAdd) {
         className = className.replace('/', '.');
-        System.out.printf("Callsites in %s:\n%s", className, String.join("\n", sitesToAdd));
-        this.callsites.put(className, sitesToAdd);
+        System.out.printf("Callsites in %s:%n%s", className, String.join("\n", sitesToAdd));
+        this.callsites.putIfAbsent(className, sitesToAdd);
     }
 
     public synchronized Map<String, Collection<String>> currentCallSites() {
