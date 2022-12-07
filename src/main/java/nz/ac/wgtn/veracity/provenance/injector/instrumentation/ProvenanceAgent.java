@@ -5,13 +5,7 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-
-import java.lang.instrument.ClassFileTransformer;
-import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
-import java.security.ProtectionDomain;
-import java.util.HashSet;
-import java.util.Set;
 
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
@@ -63,6 +57,10 @@ public class ProvenanceAgent {
     private static final ElementMatcher.Junction<MethodDescription> ALLOWED_METHODS = any()
             .and(not(ElementMatchers.isConstructor()))
             .and(not(ElementMatchers.isStatic()));
+
+    private ProvenanceAgent() {
+
+    }
 
     /**
      * Allows installation of java agent from command line.

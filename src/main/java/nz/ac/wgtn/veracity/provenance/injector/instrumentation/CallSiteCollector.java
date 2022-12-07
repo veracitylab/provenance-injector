@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class CallSiteCollector {
     private static CallSiteCollector instance = null;
+    private static final boolean LOGGING = true;
 
     private final ConcurrentMap<String, Collection<String>> callsites;
 
@@ -24,7 +25,9 @@ public class CallSiteCollector {
 
     public synchronized void addCallSites(String className, Collection<String> sitesToAdd) {
         className = className.replace('/', '.');
-        System.out.printf("Callsites in %s:%n%s", className, String.join("\n", sitesToAdd));
+        if (LOGGING) {
+            System.out.printf("Callsites in %s:%n%s", className, String.join("\n", sitesToAdd));
+        }
         this.callsites.putIfAbsent(className, sitesToAdd);
     }
 

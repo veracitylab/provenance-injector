@@ -7,21 +7,27 @@ import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class ClassLoadTransformer implements ClassFileTransformer {
+    private static final Collection<String> ignorePackages = Set.of(
+            "sun/",
+            "java/lang/",
+            "java/util/",
+            "java/security/",
+            "java/io/"
+    );
+
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-        //TODO: Replace filter with something better. The filter should transform the class name to something that is easily matched against in the binding API
-        if (className.contains("nz/ac/vuw")) {
-            visitCallSites(className);
-        }
+        visitCallSites(className);
         return classfileBuffer;
     }
 
     private static void visitCallSites(String className) {
+        if(ignorePackages.stream().parallel().anyMatch(className::startsWith)) {
+            return;
+        }
         try {
             Collection<String> sites = new HashSet<>();
             new ClassReader(className).accept(new CallSiteVisitor(sites), 0);
