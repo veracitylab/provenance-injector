@@ -1,4 +1,4 @@
-## Provenance Injector for JEE
+## This readme is not completed
 
 This project contains the logic to track method invocations that can be mapped to the use of features of interest. It creates (upon running `mvn package`) an agent that intercepts method invocations.
 

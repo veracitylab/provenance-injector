@@ -4,6 +4,7 @@ import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,5 +25,9 @@ public class InvocationTracker {
 
     public synchronized void addInvocation(Invocation invocation) {
         this.invocations.add(invocation);
+    }
+
+    public synchronized Collection<Invocation> getInvocations() {
+        return Collections.unmodifiableCollection(this.invocations);
     }
 }

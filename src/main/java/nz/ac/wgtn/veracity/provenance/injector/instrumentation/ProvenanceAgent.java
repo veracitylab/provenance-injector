@@ -48,7 +48,7 @@ public class ProvenanceAgent {
     }
 
     /**
-     * Installs the agent and sets up the provenance bindings.
+     * Installs the agent. The agent will only run on classes that are not included in the ignorePackages list
      * @param instrumentation instrumentation instance
      */
     private static void install(Instrumentation instrumentation) {

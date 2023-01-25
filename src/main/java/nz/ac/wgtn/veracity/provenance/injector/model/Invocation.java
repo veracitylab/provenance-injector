@@ -1,5 +1,8 @@
 package nz.ac.wgtn.veracity.provenance.injector.model;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.net.URI;
 import java.util.Collection;
 
@@ -41,5 +44,10 @@ public class Invocation {
     public static URI createMethodDescriptor(String clazz, String method, String descriptor) {
         clazz = clazz.replace('/', '.');
         return URI.create(clazz + "/" + method + "#" + descriptor);
+    }
+
+    public String toJSON() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(this);
     }
 }
