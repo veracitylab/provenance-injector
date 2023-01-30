@@ -135,12 +135,11 @@
                             </transformers>
                             <relocations>
                                 <relocation>
-                                    <pattern>nz.ac.wgtn.veracity.provenance</pattern>
-                                    <shadedPattern>shaded.provenance</shadedPattern>
+                                    <pattern>com.google.gson</pattern>
+                                    <shadedPattern>shaded.google.gson</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
-
                     </execution>
                 </executions>
             </plugin>
