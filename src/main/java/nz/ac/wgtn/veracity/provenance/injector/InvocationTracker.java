@@ -30,4 +30,8 @@ public class InvocationTracker {
     public synchronized Collection<Invocation> getInvocations() {
         return Collections.unmodifiableCollection(this.invocations);
     }
+
+    public synchronized void nuke() {
+        this.invocations.clear();
+    }
 }
