@@ -19,8 +19,7 @@ public class ProvenanceAgent {
             "sun/",
             "java/lang/",
             "java/util/",
-            "java/security/",
-            "java/io/"
+            "java/security/"
     );
 
     private ProvenanceAgent() {
@@ -34,7 +33,7 @@ public class ProvenanceAgent {
      * @param instrumentation  instrumentation instance
      */
     public static void premain(String agentArguments, Instrumentation instrumentation) {
-            install(instrumentation);
+        install(instrumentation);
     }
 
     /**

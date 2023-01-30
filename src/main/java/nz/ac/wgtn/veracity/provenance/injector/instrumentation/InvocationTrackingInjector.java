@@ -14,6 +14,8 @@ import java.util.*;
  * associated with a provenance activity.
  */
 public class InvocationTrackingInjector extends MethodVisitor {
+
+    private static final String RECORD_DESCRIPTOR = "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V";
     private final MethodVisitor visitor;
     private final String callingClass;
     private final String callingMethod;
@@ -59,7 +61,7 @@ public class InvocationTrackingInjector extends MethodVisitor {
             visitor.visitMethodInsn(Opcodes.INVOKESTATIC,
                     InvocationTrackingInjector.class.getName().replace('.', '/'),
                     "recordActivity",
-                    "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                    RECORD_DESCRIPTOR,
                     false);
         }
         super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
