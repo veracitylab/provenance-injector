@@ -7,8 +7,5 @@ public class SomeDatabaseClass {
     public void someDatabaseMethod() throws ClassNotFoundException, SQLException {
         Class.forName("org.h2.Driver");
         Connection connection = DriverManager.getConnection("jdbc:h2:mem:test", "sa", "");
-
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM NOTHING");
-        ResultSet res = statement.executeQuery();
     }
 }

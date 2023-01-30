@@ -130,6 +130,7 @@
                                         <Agent-Class>nz.ac.wgtn.veracity.provenance.injector.instrumentation.ProvenanceAgent</Agent-Class>
                                         <Can-Redefine-Classes>true</Can-Redefine-Classes>
                                         <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                                        <Boot-Class-Path>provenance-agent.jar</Boot-Class-Path>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
