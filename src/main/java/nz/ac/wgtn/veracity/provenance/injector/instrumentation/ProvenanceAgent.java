@@ -19,7 +19,8 @@ public class ProvenanceAgent {
             "sun/",
             "java/lang/",
             "java/util/",
-            "java/security/"
+            "java/security/",
+            "java/nio"
     );
 
     private ProvenanceAgent() {
@@ -55,7 +56,7 @@ public class ProvenanceAgent {
             @Override
             public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
                 if(ignorePackages.stream().parallel().anyMatch(className::startsWith)) {
-                    return classfileBuffer;
+                    return null;
                 }
 
                 ClassReader classReader = new ClassReader(classfileBuffer);
