@@ -1,10 +1,10 @@
 package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
-import net.bytebuddy.jar.asm.MethodVisitor;
-import net.bytebuddy.jar.asm.Opcodes;
 import nz.ac.wgtn.veracity.approv.jbind.Bindings;
 import nz.ac.wgtn.veracity.provenance.injector.InvocationTracker;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import java.net.URI;
 import java.util.*;

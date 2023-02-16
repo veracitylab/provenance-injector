@@ -1,17 +1,12 @@
 package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
-import net.bytebuddy.jar.asm.ClassReader;
-import net.bytebuddy.jar.asm.ClassWriter;
-import nz.ac.wgtn.veracity.approv.jbind.Execution;
-
-import java.io.IOException;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.jar.JarFile;
 
 public class ProvenanceAgent {
 

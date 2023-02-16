@@ -1,6 +1,10 @@
 package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
-import net.bytebuddy.jar.asm.*;
+
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 public class CallSiteVisitor extends ClassVisitor {
 
