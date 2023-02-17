@@ -6,6 +6,7 @@ import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
+import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeClass;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeDatabaseClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -53,7 +56,16 @@ public class InvocationTrackingInjectorTest {
     }
 
     @Test
-    public void testInvokedActivitiesAreTracked() {
+    public void testMatchingActivityInvocationsAreTracked() {
+        final String expectedJSON = "{\n" +
+                "  \"caller\": \"nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeDatabaseClass/someDatabaseMethod#()V\",\n" +
+                "  \"invocation\": \"java.sql.DriverManager/getConnection#(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;\",\n" +
+                "  \"activities\": [\n" +
+                "    \"https://veracity.wgtn.ac.nz/app-provenance#DBAccess\"\n" +
+                "  ]\n" +
+                "}";
+
+
         try {
             SomeDatabaseClass dbClass = new SomeDatabaseClass();
             dbClass.someDatabaseMethod();
@@ -64,7 +76,24 @@ public class InvocationTrackingInjectorTest {
             InvocationTracker tracker = InvocationTracker.getInstance();
             Collection<Invocation> invocations = tracker.getInvocations();
 
-            assertEquals(1, invocations.size());
+            assertEquals(2, invocations.size());
+            List<String> targetRepr = invocations.stream().map(Invocation::toJSON).filter(it -> it.equals(expectedJSON)).collect(Collectors.toList());
+            assertEquals(1, targetRepr.size());
+        }
+    }
+
+    @Test
+    public void testNoMatchingActivityInvocationsAreTracked() {
+        try {
+            SomeClass nonInterestingClass = new SomeClass();
+            nonInterestingClass.doSomeThing();
+        } catch (Exception e) {
+            System.err.println("Exception detected in subject execution");
+            e.printStackTrace();
+        } finally {
+            InvocationTracker tracker = InvocationTracker.getInstance();
+            Collection<Invocation> invocations = tracker.getInvocations();
+            assertEquals(0, invocations.size());
         }
     }
 

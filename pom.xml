@@ -57,7 +57,7 @@
 
                 <configuration>
                     <includes>
-                        <include>Test*</include>
+                        <include>**/*Test.java</include>
                     </includes>
                     <argLine>-Djdk.attach.allowAttachSelf=true</argLine>
                 </configuration>
