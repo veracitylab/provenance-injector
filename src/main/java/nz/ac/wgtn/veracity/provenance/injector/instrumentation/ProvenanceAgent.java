@@ -16,6 +16,7 @@ public class ProvenanceAgent {
             "java/util/",
             "java/security/",
             "java/nio"
+//            "java/sql"
     );
 
     private ProvenanceAgent() {
@@ -58,7 +59,7 @@ public class ProvenanceAgent {
                 ClassWriter writer = new SafeClassWriter(classReader, loader, ClassWriter.COMPUTE_FRAMES);
                 try {
                     CallSiteVisitor visitor = new CallSiteVisitor(writer);
-                    classReader.accept(visitor, 0);
+                    classReader.accept(visitor, ClassReader.EXPAND_FRAMES);
                     return writer.toByteArray();
                 } catch (Exception e) {
                     e.printStackTrace();

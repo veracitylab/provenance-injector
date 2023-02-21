@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nz.ac.wgtn.veracity.provenance.injector.TestUtils.loadAgentJar;
 import static org.junit.Assert.*;
 
 
@@ -76,9 +77,10 @@ public class InvocationTrackingInjectorTest {
             InvocationTracker tracker = InvocationTracker.getInstance();
             Collection<Invocation> invocations = tracker.getInvocations();
 
-            assertEquals(2, invocations.size());
-            List<String> targetRepr = invocations.stream().map(Invocation::toJSON).filter(it -> it.equals(expectedJSON)).collect(Collectors.toList());
-            assertEquals(1, targetRepr.size());
+            assertEquals(1, invocations.size());
+            Invocation target = invocations.iterator().next();
+            assertNotNull(target);
+            assertEquals(expectedJSON, target.toJSON());
         }
     }
 
@@ -95,16 +97,6 @@ public class InvocationTrackingInjectorTest {
             Collection<Invocation> invocations = tracker.getInvocations();
             assertEquals(0, invocations.size());
         }
-    }
-
-    private static File loadAgentJar() {
-        File agent = new File("target/provenance-agent.jar");
-
-        if (!agent.exists()) {
-            throw new RuntimeException("Agent jar not detected");
-        }
-
-        return agent;
     }
 
 }

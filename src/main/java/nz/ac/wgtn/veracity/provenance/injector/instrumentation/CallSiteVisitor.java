@@ -24,5 +24,6 @@ public class CallSiteVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor visitor = super.visitMethod(access, name, descriptor, signature, exceptions);
         return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor);
+//        return new ArgumentCaptureInjector(visitor, access, name, descriptor, signature);
     }
 }
