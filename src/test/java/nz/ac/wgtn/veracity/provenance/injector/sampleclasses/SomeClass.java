@@ -9,6 +9,13 @@ public class SomeClass {
     public String doSomeThing() {
         return "something";
     }
+    public String doSomethingDynamically(String theArg) {
+        return theArg;
+    }
+
+    public static String doSomethingStatically(String theArg) {
+        return theArg;
+    }
 
     public void somethingElse() {
         System.out.println("Beans");

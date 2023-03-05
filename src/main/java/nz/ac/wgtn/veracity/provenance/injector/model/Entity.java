@@ -6,16 +6,22 @@ public class Entity {
 
     private int code;
 
-    private URI source;
+    private final URI source;
 
-    private URI type;
+    private final URI type;
 
-    private Object value;
+    private final Object value;
+
+    private final Object target;
 
     private Entity(URI source, URI type, Object value) {
         this.source = source;
         this.value = value;
         this.type = type;
+        //TODO: Add way to associate this entity with the consumer of the object. To do this I will add some code to the
+        // injector that will obtain the Object memory reference and associate by that.
+        //
+        this.target = null;
     }
 
     public static Entity from(URI source, String type, Object value) {
@@ -32,5 +38,9 @@ public class Entity {
 
     public URI getSource() {
         return this.source;
+    }
+
+    public Object getTarget() {
+        return this.target;
     }
 }

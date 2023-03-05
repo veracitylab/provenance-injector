@@ -1,9 +1,5 @@
 package nz.ac.wgtn.veracity.provenance.injector;
 
-import com.sun.tools.attach.AgentInitializationException;
-import com.sun.tools.attach.AgentLoadException;
-import com.sun.tools.attach.AttachNotSupportedException;
-import com.sun.tools.attach.VirtualMachine;
 import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeClass;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeDatabaseClass;
@@ -13,36 +9,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.net.URI;
 
-import static nz.ac.wgtn.veracity.provenance.injector.TestUtils.loadAgentJar;
-import static org.junit.Assert.fail;
-
-public class EntityTrackingTest {
+public class EntityFromArgTrackingTest {
 
     @BeforeClass
     public static void setUpAll() {
-        RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
-        long process = runtime.getPid();
-
-        try {
-            VirtualMachine vm = VirtualMachine.attach(String.valueOf(process));
-            File agent = loadAgentJar();
-            vm.loadAgent(agent.getAbsolutePath());
-
-        } catch (AttachNotSupportedException ex) {
-            System.err.printf("Error attaching to self, JVM option %s not present%n", "-Djdk.attach.allowAttachSelf=true");
-            fail(ex.getMessage());
-        } catch (IOException ex) {
-            fail(ex.getMessage());
-        } catch (AgentLoadException | AgentInitializationException ex) {
-            System.err.println("Error loading agent");
-            fail(ex.getMessage());
-        }
+        TestUtils.attachAgentClass();
     }
 
     @Before
@@ -64,6 +37,44 @@ public class EntityTrackingTest {
         Assert.assertEquals(expectedValue, (String) entity.getValue());
         Assert.assertEquals(expectedType, entity.getType());
         Assert.assertEquals(expectedSource, entity.getSource());
+    }
+
+    @Test
+    public void testTrackingDatabaseEntityTargetCollectedWhenPresent() throws Exception {
+        SomeDatabaseClass databaseClass = new SomeDatabaseClass();
+        String expectedValue = "jdbc:h2:mem:test";
+        databaseClass.someDatabaseMethod();
+
+        EntityTracker tracker = EntityTracker.getInstance();
+        Assert.assertEquals(1, tracker.getEntities().size());
+        Entity entity = tracker.getEntities().iterator().next();
+        Assert.assertEquals(expectedValue, (String) entity.getValue());
+        Assert.assertNotNull(entity.getTarget());
+    }
+
+    @Test
+    public void testTrackingStaticInvocationGeneratesSingleEntity() {
+        String expectedValue = "theArg";
+        SomeClass.doSomethingStatically("theArg");
+
+        EntityTracker tracker = EntityTracker.getInstance();
+        Assert.assertEquals(1, tracker.getEntities().size());
+        Entity entity = tracker.getEntities().iterator().next();
+        Assert.assertEquals(expectedValue, (String) entity.getValue());
+    }
+
+    @Test
+    public void testTrackingDynamicInvocationGeneratesMultipleEntities() {
+        SomeClass someClass = new SomeClass();
+        String expectedValue = "theArg";
+        someClass.doSomethingDynamically(expectedValue);
+        someClass.doSomethingDynamically(expectedValue);
+
+        EntityTracker tracker = EntityTracker.getInstance();
+        Assert.assertEquals(2, tracker.getEntities().size());
+        Entity entity = tracker.getEntities().iterator().next();
+        Assert.assertEquals(expectedValue, (String) entity.getValue());
+
     }
 
     @Test
