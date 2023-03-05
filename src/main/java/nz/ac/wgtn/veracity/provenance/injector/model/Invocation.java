@@ -33,18 +33,6 @@ public class Invocation {
         return new Invocation(caller, invocation, activities);
     }
 
-    /**
-     * Utility method for creating URI's from method signatures.
-     *
-     * @param clazz class containing the method
-     * @param method method name
-     * @param descriptor method descriptor
-     * @return URI in the format: $qualifiedClassname/$methodName#methodDescriptor
-     */
-    public static URI createMethodDescriptor(String clazz, String method, String descriptor) {
-        clazz = clazz.replace('/', '.');
-        return URI.create(clazz + "/" + method + "#" + descriptor);
-    }
 
     public String toJSON() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();

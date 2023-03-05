@@ -1,14 +1,10 @@
-package nz.ac.wgtn.veracity.provenance.injector;
+package nz.ac.wgtn.veracity.provenance.injector.tracker;
 
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class InvocationTracker {
 

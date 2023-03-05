@@ -8,6 +8,7 @@ import com.sun.tools.attach.VirtualMachine;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeClass;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeDatabaseClass;
+import nz.ac.wgtn.veracity.provenance.injector.tracker.InvocationTracker;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,8 +18,6 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static nz.ac.wgtn.veracity.provenance.injector.TestUtils.loadAgentJar;
 import static org.junit.Assert.*;

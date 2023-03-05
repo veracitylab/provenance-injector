@@ -4,6 +4,8 @@ import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
+import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeClass;
+import nz.ac.wgtn.veracity.provenance.injector.tracker.EntityTracker;
 import org.junit.BeforeClass;
 
 import java.io.File;
@@ -38,6 +40,11 @@ public class EntityTrackingTest {
     }
 
     public void testTrackingEntityArgSingleInt() {
+        SomeClass someClass = new SomeClass();
+        int expectedVal = 2;
+        someClass.somethingWithArg(expectedVal);
+
+        EntityTracker tracker = EntityTracker.getInstance();
 
     }
 

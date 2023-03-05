@@ -1,6 +1,6 @@
-package nz.ac.wgtn.veracity.provenance.injector;
+package nz.ac.wgtn.veracity.provenance.injector.tracker;
 
-import nz.ac.wgtn.veracity.approv.jbind.EntityRef;
+import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -10,7 +10,7 @@ public class EntityTracker {
 
     private static final EntityTracker instance = new EntityTracker();
 
-    private final Collection<EntityRef> refs;
+    private final Collection<Entity> refs;
 
     private EntityTracker() {
         this.refs = new HashSet<>();
@@ -20,11 +20,11 @@ public class EntityTracker {
         return instance;
     }
 
-    public synchronized void addEntity(EntityRef ref) {
+    public synchronized void addEntity(Entity ref) {
         this.refs.add(ref);
     }
 
-    public synchronized Collection<EntityRef> getRefs() {
+    public synchronized Collection<Entity> getRefs() {
         return Collections.unmodifiableCollection(this.refs);
     }
 }
