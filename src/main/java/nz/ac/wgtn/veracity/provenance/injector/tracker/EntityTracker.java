@@ -24,7 +24,11 @@ public class EntityTracker {
         this.refs.add(ref);
     }
 
-    public synchronized Collection<Entity> getRefs() {
+    public synchronized Collection<Entity> getEntities() {
         return Collections.unmodifiableCollection(this.refs);
+    }
+
+    public synchronized  void nuke() {
+        this.refs.clear();
     }
 }

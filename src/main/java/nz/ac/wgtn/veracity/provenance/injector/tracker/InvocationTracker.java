@@ -20,7 +20,7 @@ public class InvocationTracker {
     }
 
     public synchronized void addInvocation(Invocation invocation) {
-        System.out.println("Invocation detected");
+        System.out.println("DEBUGGING: Invocation detected");
         this.invocations.add(invocation);
     }
 
