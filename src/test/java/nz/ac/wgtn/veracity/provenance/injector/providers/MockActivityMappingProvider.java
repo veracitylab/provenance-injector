@@ -9,6 +9,6 @@ public class MockActivityMappingProvider implements ActivityMappingProvider {
     @Override
     public Set<ActivityMapping> getActivityMappings() throws Exception {
         System.out.println("This has been loaded by the service loader");
-        return null;
+        return Set.of();
     }
 }
