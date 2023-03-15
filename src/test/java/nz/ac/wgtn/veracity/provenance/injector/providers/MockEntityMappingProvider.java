@@ -12,7 +12,7 @@ public class MockEntityMappingProvider implements EntityMappingProvider {
 
     @Override
     public Set<EntityMapping> getEntityMappings() throws Exception {
-
+        System.out.printf("DEBUG: %s loaded%n", this.getClass().getName());
         return Set.of(
                 EntityMappingFactory.getSingleArgCollectorMapping(JvmPrimitiveTypes.BOOLEAN, 0),
                 EntityMappingFactory.getSingleArgCollectorMapping(JvmPrimitiveTypes.DOUBLE, 0)
