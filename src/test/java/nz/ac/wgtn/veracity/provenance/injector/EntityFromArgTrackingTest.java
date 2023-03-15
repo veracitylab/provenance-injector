@@ -3,6 +3,7 @@ package nz.ac.wgtn.veracity.provenance.injector;
 import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeClass;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeDatabaseClass;
+import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeInterestingClass;
 import nz.ac.wgtn.veracity.provenance.injector.tracker.EntityTracker;
 import org.junit.Assert;
 import org.junit.Before;

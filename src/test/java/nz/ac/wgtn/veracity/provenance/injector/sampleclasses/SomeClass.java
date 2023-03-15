@@ -22,7 +22,7 @@ public class SomeClass {
     }
 
     public void somethingWithArg(boolean item) {
-
+        boolean inverted = item != item;
     }
 
     public void somethingWithArg(char item) {

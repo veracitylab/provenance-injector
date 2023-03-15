@@ -74,10 +74,4 @@ public class InvocationTrackingInjectorTest {
         }
     }
 
-    @Test
-    public void thisTestIsForTestingTheServiceLoaders() {
-        ServiceLoader<ActivityMappingProvider> activityMappingsProviders = ServiceLoader.load(ActivityMappingProvider.class);
-        System.out.println("Beans");
-    }
-
 }
