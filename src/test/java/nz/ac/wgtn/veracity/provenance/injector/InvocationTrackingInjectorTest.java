@@ -1,6 +1,7 @@
 package nz.ac.wgtn.veracity.provenance.injector;
 
 
+import nz.ac.wgtn.veracity.approv.jbind.ActivityMappingProvider;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeClass;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeDatabaseClass;
@@ -9,6 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import java.util.Collection;
+import java.util.ServiceLoader;
 
 import static org.junit.Assert.*;
 
@@ -70,6 +72,12 @@ public class InvocationTrackingInjectorTest {
             Collection<Invocation> invocations = tracker.getInvocations();
             assertEquals(0, invocations.size());
         }
+    }
+
+    @Test
+    public void thisTestIsForTestingTheServiceLoaders() {
+        ServiceLoader<ActivityMappingProvider> activityMappingsProviders = ServiceLoader.load(ActivityMappingProvider.class);
+        System.out.println("Beans");
     }
 
 }
