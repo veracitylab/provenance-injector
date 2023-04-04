@@ -1,6 +1,5 @@
 package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
-
 import nz.ac.wgtn.veracity.approv.jbind.Bindings;
 import nz.ac.wgtn.veracity.approv.jbind.EntityCreation;
 import nz.ac.wgtn.veracity.approv.jbind.EntityRef;
@@ -27,11 +26,13 @@ public class CallSiteVisitor extends ClassVisitor {
         super(Opcodes.ASM9, writer);
     }
 
+
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         super.visit(version, access, name, signature, superName, interfaces);
         this.currentClass = name;
     }
+
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
@@ -46,24 +47,21 @@ public class CallSiteVisitor extends ClassVisitor {
                     Type[] argTypes = Type.getArgumentTypes(descriptor);
 
                     // For index boosting non-static invocations
-//                    int offset = (opcode == Opcodes.INVOKESTATIC) ? 0 : 1;
+                    int offset = (access & Opcodes.ACC_STATIC) != 0 ? 0 : 1;
                     int varTableIndex = entity.getRefIndex();
                     Type arg = argTypes[varTableIndex];
-                    System.out.println(arg);
-                    boxAndStore(visitor, this.currentClass, name, descriptor, entity, arg, varTableIndex + 1);
+                    boxAndStore(visitor, this.currentClass, name, descriptor, entity, arg, varTableIndex + offset);
                 }
             });
         }
 
         return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor);
-//        return new ArgumentCaptureInjector(visitor, access, name, descriptor, signature);
-
-
     }
 
 
     /**
      * Records a parameter and generates a new entity from said parameter.
+     *
      * @param param recorded parameter
      */
     public static void recordParameter(String callingClass, String callingMethod, String callingDescriptor, String entityDesc, Object param) {
@@ -73,16 +71,17 @@ public class CallSiteVisitor extends ClassVisitor {
         System.out.println("DEBUGGING: New entity detected");
     }
 
+
     /**
-     * Utility method that boxes primitives and injects bytecode that will record the value using the recordParameter method.
-     * Boxing was used to have singular collection method for recording.
+     * Utility method that boxes primitives and injects bytecode that will record the value using the recordParameter method. Boxing was used to have singular collection
+     * method for recording.
      */
     private void boxAndStore(MethodVisitor visitor, String callingClass, String callingMethod, String callingDescriptor, EntityCreation entity, Type type, int index) {
         visitor.visitLdcInsn(callingClass);
         visitor.visitLdcInsn(callingMethod);
         visitor.visitLdcInsn(callingDescriptor);
         visitor.visitLdcInsn(entity.getEntity().toString());
-        switch(type.getSort()) {
+        switch (type.getSort()) {
             case Type.BOOLEAN:
                 visitor.visitVarInsn(Opcodes.ILOAD, index);
                 visitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
@@ -126,9 +125,9 @@ public class CallSiteVisitor extends ClassVisitor {
         }
 
         visitor.visitMethodInsn(Opcodes.INVOKESTATIC,
-                                     InvocationTrackingInjector.class.getName().replace('.', '/'),
-                                     "recordParameter",
-                                     RECORD_PARAMS_DESCRIPTOR,
-                                     false);
+                                CallSiteVisitor.class.getName().replace('.', '/'),
+                                "recordParameter",
+                                RECORD_PARAMS_DESCRIPTOR,
+                                false);
     }
 }
