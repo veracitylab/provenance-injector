@@ -46,7 +46,7 @@ public class EntityFromArgTrackingTest {
         databaseClass.someDatabaseMethod();
 
         EntityTracker tracker = EntityTracker.getInstance();
-        Assert.assertEquals(1, tracker.getEntities().size());
+        Assert.assertEquals(2, tracker.getEntities().size());
         Entity entity = tracker.getEntities().iterator().next();
         Assert.assertEquals(expectedValue, (String) entity.getValue());
         Assert.assertNotNull(entity.getTarget());
