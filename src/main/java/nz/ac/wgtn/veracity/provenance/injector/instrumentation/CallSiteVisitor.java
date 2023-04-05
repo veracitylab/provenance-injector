@@ -37,11 +37,9 @@ public class CallSiteVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor visitor = super.visitMethod(access, name, descriptor, signature, exceptions);
-        System.out.println("Visiting" + " " + this.currentClass + " " + name + " " + descriptor);
 
         Set<EntityCreation> createEntities = Bindings.getEntityCreations(this.currentClass.replace('/', '.'), name, descriptor);
         if (!createEntities.isEmpty()) {
-            System.out.println("It has been done!");
             createEntities.forEach(entity -> {
                 if (entity.getRef() == EntityRef.ARG) {
                     Type[] argTypes = Type.getArgumentTypes(descriptor);
