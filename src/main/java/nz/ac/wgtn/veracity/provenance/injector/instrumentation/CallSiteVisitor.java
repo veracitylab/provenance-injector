@@ -65,8 +65,8 @@ public class CallSiteVisitor extends ClassVisitor {
     public static void recordParameter(String callingClass, String callingMethod, String callingDescriptor, String entityDesc, Object param) {
         URI entitySource = URIGenerator.createMethodDescriptor(callingClass, callingMethod, callingDescriptor);
         Entity entity = Entity.from(entitySource, entityDesc, param);
-        EntityTracker.getInstance().addEntity(entity);
-        System.out.println("DEBUGGING: New entity detected");
+        int hash = System.identityHashCode(param);
+        EntityTracker.getInstance().addEntity(entity, hash);
     }
 
 

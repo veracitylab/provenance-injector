@@ -57,7 +57,6 @@ public class InvocationTrackingInjector extends MethodVisitor {
         Set<URI> activities = Bindings.getActivities(owner.replace('/', '.'), name, descriptor);
 
         if (!activities.isEmpty() && !owner.equals(this.callingClass)) {
-            System.out.println(this.callingClass);
             visitor.visitLdcInsn(activities.stream().map(URI::toString).collect(Collectors.joining(";")));
             visitor.visitLdcInsn(this.callingClass);
             visitor.visitLdcInsn(this.callingMethod);

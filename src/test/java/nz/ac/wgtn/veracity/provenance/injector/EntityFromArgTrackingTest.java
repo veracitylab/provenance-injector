@@ -10,6 +10,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class EntityFromArgTrackingTest {
 
@@ -18,26 +22,29 @@ public class EntityFromArgTrackingTest {
         TestUtils.attachAgentClass();
     }
 
+
     @Before
     public void clearEntityTracker() {
         EntityTracker.getInstance().nuke();
     }
+
 
     @Test
     public void testTrackingDatabaseEntityWhenPresent() throws Exception {
         SomeDatabaseClass databaseClass = new SomeDatabaseClass();
         String expectedValue = "jdbc:h2:mem:test";
         URI expectedType = URI.create("https://veracity.wgtn.ac.nz/app-provenance#Database");
-        URI expectedSource = URI.create("java.sql.DriverManager/getConnection#(Ljava/lang/String;Ljava/util/Properties;Ljava/lang/Class;)Ljava/sql/Connection;");
+        URI expectedSource = URI.create("java.sql.DriverManager/getConnection#(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;");
         databaseClass.someDatabaseMethod();
 
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
-        Assert.assertEquals(expectedValue, (String) entity.getValue());
+        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
+        Assert.assertEquals(expectedValue, entity.getValue());
         Assert.assertEquals(expectedType, entity.getType());
         Assert.assertEquals(expectedSource, entity.getSource());
     }
+
 
     @Test
     public void testTrackingDatabaseEntityTargetCollectedWhenPresent() throws Exception {
@@ -46,11 +53,12 @@ public class EntityFromArgTrackingTest {
         databaseClass.someDatabaseMethod();
 
         EntityTracker tracker = EntityTracker.getInstance();
-        Assert.assertEquals(2, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
-        Assert.assertEquals(expectedValue, (String) entity.getValue());
+        Assert.assertEquals(1, tracker.getEntities().size());
+        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
+        Assert.assertEquals(expectedValue, entity.getValue());
         Assert.assertNotNull(entity.getTarget());
     }
+
 
     @Test
     public void testTrackingStaticInvocationGeneratesSingleEntity() {
@@ -59,23 +67,26 @@ public class EntityFromArgTrackingTest {
 
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
-        Assert.assertEquals(expectedValue, (String) entity.getValue());
+        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
+        Assert.assertEquals(expectedValue, entity.getValue());
     }
+
 
     @Test
     public void testTrackingDynamicInvocationGeneratesMultipleEntities() {
         SomeClass someClass = new SomeClass();
         String expectedValue = "theArg";
+        String expectedValue2 = "theArg2";
         someClass.doSomethingDynamically(expectedValue);
-        someClass.doSomethingDynamically(expectedValue);
+        someClass.doSomethingDynamically(expectedValue2);
 
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(2, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
-        Assert.assertEquals(expectedValue, (String) entity.getValue());
+        Collection<Entity> entities = tracker.getEntities().values();
+        Assert.assertEquals(Set.of(expectedValue, expectedValue2), entities.stream().map(Entity::getValue).collect(Collectors.toSet()));
 
     }
+
 
     @Test
     public void testTrackingDatabaseEntityWhenNotPresent() {
@@ -86,6 +97,7 @@ public class EntityFromArgTrackingTest {
         Assert.assertEquals(0, tracker.getEntities().size());
     }
 
+
     @Test
     public void testTrackingEntityArgSingleBool() {
         SomeClass someClass = new SomeClass();
@@ -94,9 +106,10 @@ public class EntityFromArgTrackingTest {
 
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
-        Assert.assertEquals(expectedVal, (boolean) entity.getValue());
+        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
+        Assert.assertEquals(expectedVal, entity.getValue());
     }
+
 
     @Test
     public void testTrackingEntityArgSingleChar() {
@@ -106,9 +119,10 @@ public class EntityFromArgTrackingTest {
 
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
+        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
         Assert.assertEquals(expectedVal, (char) entity.getValue());
     }
+
 
     @Test
     public void testTrackingEntityArgSingleByte() {
@@ -118,9 +132,10 @@ public class EntityFromArgTrackingTest {
 
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
+        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
         Assert.assertEquals(expectedVal, (byte) entity.getValue());
     }
+
 
     @Test
     public void testTrackingEntityArgSingleShort() {
@@ -130,9 +145,10 @@ public class EntityFromArgTrackingTest {
 
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
+        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
         Assert.assertEquals(expectedVal, (short) entity.getValue());
     }
+
 
     @Test
     public void testTrackingEntityArgSingleInt() {
@@ -142,9 +158,10 @@ public class EntityFromArgTrackingTest {
 
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
+        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
         Assert.assertEquals(expectedVal, (int) entity.getValue());
     }
+
 
     @Test
     public void testTrackingEntityArgSingleFloat() {
@@ -154,9 +171,10 @@ public class EntityFromArgTrackingTest {
 
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
+        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
         Assert.assertEquals(expectedVal, (float) entity.getValue(), 1e-6F);
     }
+
 
     @Test
     public void testTrackingEntityArgSingleLong() {
@@ -166,9 +184,10 @@ public class EntityFromArgTrackingTest {
 
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
+        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
         Assert.assertEquals(expectedVal, (long) entity.getValue());
     }
+
 
     @Test
     public void testTrackingEntityArgSingleDouble() {
@@ -178,9 +197,10 @@ public class EntityFromArgTrackingTest {
 
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
+        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
         Assert.assertEquals(expectedVal, (double) entity.getValue(), 1e-6D);
     }
+
 
     @Test
     public void testTrackingEntityArgSingleObject() {
@@ -190,7 +210,7 @@ public class EntityFromArgTrackingTest {
 
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().iterator().next();
+        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
         Assert.assertEquals(expectedVal, entity.getValue());
     }
 }
