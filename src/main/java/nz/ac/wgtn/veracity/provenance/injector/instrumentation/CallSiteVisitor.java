@@ -51,6 +51,11 @@ public class CallSiteVisitor extends ClassVisitor {
                     boxAndStore(visitor, this.currentClass, name, descriptor, entity, arg, varTableIndex + offset);
                 }
             });
+
+            // If there are entities to create, we want to generate a "taint" for the entities that will be recorded
+            // Then we will use a new method visitor that will look for return or throw instructions
+            // That visitor will take the taint and call a method in the entity collector that will then join the tainted entities with the collected return target
+            // The taint can then be destroyed
         }
 
         return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor);
