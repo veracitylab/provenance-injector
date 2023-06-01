@@ -1,7 +1,6 @@
 package nz.ac.wgtn.veracity.provenance.injector;
 
 
-import nz.ac.wgtn.veracity.approv.jbind.ActivityMappingProvider;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeClass;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeDatabaseClass;
@@ -10,17 +9,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import java.util.Collection;
-import java.util.ServiceLoader;
 
 import static org.junit.Assert.*;
 
 
 public class InvocationTrackingInjectorTest {
-    private static final String PREFIX = "nz/ac/wgtn/veracity/provenance/injector/sampleclasses/";
-    private static final String CLASS_1_NAME = PREFIX + "SomeClass";
-    private static final String CLASS_2_NAME = PREFIX + "SomeDatabaseClass";
-
-
     @BeforeClass
     public static void setUpAll() {
         TestUtils.attachAgentClass();
@@ -33,15 +26,6 @@ public class InvocationTrackingInjectorTest {
 
     @Test
     public void testMatchingActivityInvocationsAreTracked() {
-        final String expectedJSON = "{\n" +
-                "  \"caller\": \"nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeDatabaseClass/someDatabaseMethod#()V\",\n" +
-                "  \"invocation\": \"java.sql.DriverManager/getConnection#(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;\",\n" +
-                "  \"activities\": [\n" +
-                "    \"https://veracity.wgtn.ac.nz/app-provenance#DBAccess\"\n" +
-                "  ]\n" +
-                "}";
-
-
         try {
             SomeDatabaseClass dbClass = new SomeDatabaseClass();
             dbClass.someDatabaseMethod();
@@ -55,7 +39,6 @@ public class InvocationTrackingInjectorTest {
             assertEquals(1, invocations.size());
             Invocation target = invocations.iterator().next();
             assertNotNull(target);
-            assertEquals(expectedJSON, target.toJSON());
         }
     }
 

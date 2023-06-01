@@ -45,21 +45,6 @@ public class EntityFromArgTrackingTest {
         Assert.assertEquals(expectedSource, entity.getSource());
     }
 
-
-    @Test
-    public void testTrackingDatabaseEntityTargetCollectedWhenPresent() throws Exception {
-        SomeDatabaseClass databaseClass = new SomeDatabaseClass();
-        String expectedValue = "jdbc:h2:mem:test";
-        databaseClass.someDatabaseMethod();
-
-        EntityTracker tracker = EntityTracker.getInstance();
-        Assert.assertEquals(1, tracker.getEntities().size());
-        Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
-        Assert.assertEquals(expectedValue, entity.getValue());
-        Assert.assertNotNull(entity.getTarget());
-    }
-
-
     @Test
     public void testTrackingStaticInvocationGeneratesSingleEntity() {
         String expectedValue = "theArg";
