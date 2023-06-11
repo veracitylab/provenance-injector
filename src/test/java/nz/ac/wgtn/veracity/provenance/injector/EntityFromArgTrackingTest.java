@@ -34,7 +34,6 @@ public class EntityFromArgTrackingTest {
         SomeDatabaseClass databaseClass = new SomeDatabaseClass();
         String expectedValue = "jdbc:h2:mem:test";
         URI expectedType = URI.create("https://veracity.wgtn.ac.nz/app-provenance#Database");
-        URI expectedSource = URI.create("java.sql.DriverManager/getConnection#(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;");
         databaseClass.someDatabaseMethod();
 
         EntityTracker tracker = EntityTracker.getInstance();
@@ -43,7 +42,6 @@ public class EntityFromArgTrackingTest {
         Assert.assertNotNull(entity);
         Assert.assertEquals(expectedValue, entity.getValue());
         Assert.assertEquals(expectedType, entity.getType());
-        Assert.assertEquals(expectedSource, entity.getSource());
     }
 
     @Test

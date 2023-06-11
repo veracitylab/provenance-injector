@@ -15,6 +15,7 @@ import org.objectweb.asm.Type;
 import java.net.URI;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CallSiteVisitor extends ClassVisitor {
 
@@ -39,12 +40,13 @@ public class CallSiteVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor visitor = super.visitMethod(access, name, descriptor, signature, exceptions);
         String taint = UUID.randomUUID().toString();
-        boolean captureReturnValue = false;
+        AtomicBoolean captureReturnValue = new AtomicBoolean(false);
 
         Set<EntityCreation> createEntities = Bindings.getEntityCreations(this.currentClass.replace('/', '.'), name, descriptor);
         if (!createEntities.isEmpty()) {
             createEntities.forEach(entity -> {
                 if (entity.getRef() == EntityRef.ARG) {
+                    captureReturnValue.set(true);
                     Type[] argTypes = Type.getArgumentTypes(descriptor);
 
                     // For index boosting non-static invocations
@@ -54,15 +56,9 @@ public class CallSiteVisitor extends ClassVisitor {
                     boxAndStore(visitor, this.currentClass, name, descriptor, entity, arg, varTableIndex + offset, taint);
                 }
             });
-
-            // Do not capture return targets of type void
-            Type returnType = Type.getReturnType(descriptor);
-            if (returnType != Type.VOID_TYPE) {
-                return new TargetCollectingInjector(visitor, taint);
-            }
         }
 
-        return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor);
+        return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor, captureReturnValue.get(), taint);
     }
 
 
