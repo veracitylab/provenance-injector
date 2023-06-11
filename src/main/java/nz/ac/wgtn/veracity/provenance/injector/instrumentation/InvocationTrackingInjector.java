@@ -171,8 +171,8 @@ public class InvocationTrackingInjector extends MethodVisitor {
     /**
      * This method is used to capture a target value.
      * @param target The target value to be captured
-     * @param taint The unique taint given to the target value, which is used when associating entities with
-     *                   the target with a respective entity.
+     * @param taint The unique taint given to the target value, which is used when associating entities with the target
+     *              with a respective entity.
      */
     public static void captureTarget(Object target, String taint) {
         EntityTracker.getInstance().addItem(taint, null, target);

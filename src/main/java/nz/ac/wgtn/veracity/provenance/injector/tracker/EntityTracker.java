@@ -58,7 +58,9 @@ public class EntityTracker {
         return Collections.unmodifiableMap(this.refs);
     }
 
-    public synchronized  void nuke() {
+    public synchronized void nuke() {
         this.refs.clear();
+        this.targetIngestor.clear();
+        this.taintToIdentities.clear();
     }
 }
