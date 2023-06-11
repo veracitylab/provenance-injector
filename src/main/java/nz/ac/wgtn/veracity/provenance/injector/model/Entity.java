@@ -12,15 +12,12 @@ public class Entity {
 
     private final Object value;
 
-    private final Object target;
+    private Object target;
 
     private Entity(URI source, URI type, Object value) {
         this.source = source;
         this.value = value;
         this.type = type;
-        //TODO: Add way to associate this entity with the consumer of the object. To do this I will add some code to the
-        // injector that will obtain the Object memory reference and associate by that.
-        //
         this.target = null;
     }
 
@@ -42,5 +39,9 @@ public class Entity {
 
     public Object getTarget() {
         return this.target;
+    }
+
+    public void setTarget(Object target) {
+        this.target = target;
     }
 }

@@ -14,12 +14,13 @@ import org.objectweb.asm.Type;
 
 import java.net.URI;
 import java.util.Set;
+import java.util.UUID;
 
 public class CallSiteVisitor extends ClassVisitor {
 
     private String currentClass = null;
 
-    private static final String RECORD_PARAMS_DESCRIPTOR = "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V";
+    private static final String RECORD_PARAMS_DESCRIPTOR = "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V";
 
 
     protected CallSiteVisitor(ClassWriter writer) {
@@ -37,6 +38,8 @@ public class CallSiteVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor visitor = super.visitMethod(access, name, descriptor, signature, exceptions);
+        String taint = UUID.randomUUID().toString();
+        boolean captureReturnValue = false;
 
         Set<EntityCreation> createEntities = Bindings.getEntityCreations(this.currentClass.replace('/', '.'), name, descriptor);
         if (!createEntities.isEmpty()) {
@@ -48,14 +51,15 @@ public class CallSiteVisitor extends ClassVisitor {
                     int offset = (access & Opcodes.ACC_STATIC) != 0 ? 0 : 1;
                     int varTableIndex = entity.getRefIndex();
                     Type arg = argTypes[varTableIndex];
-                    boxAndStore(visitor, this.currentClass, name, descriptor, entity, arg, varTableIndex + offset);
+                    boxAndStore(visitor, this.currentClass, name, descriptor, entity, arg, varTableIndex + offset, taint);
                 }
             });
 
-            // If there are entities to create, we want to generate a "taint" for the entities that will be recorded
-            // Then we will use a new method visitor that will look for return or throw instructions
-            // That visitor will take the taint and call a method in the entity collector that will then join the tainted entities with the collected return target
-            // The taint can then be destroyed
+            // Do not capture return targets of type void
+            Type returnType = Type.getReturnType(descriptor);
+            if (returnType != Type.VOID_TYPE) {
+                return new TargetCollectingInjector(visitor, taint);
+            }
         }
 
         return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor);
@@ -67,11 +71,10 @@ public class CallSiteVisitor extends ClassVisitor {
      *
      * @param param recorded parameter
      */
-    public static void recordParameter(String callingClass, String callingMethod, String callingDescriptor, String entityDesc, Object param) {
+    public static void recordParameter(String callingClass, String callingMethod, String callingDescriptor, String entityDesc, String identifier, Object param) {
         URI entitySource = URIGenerator.createMethodDescriptor(callingClass, callingMethod, callingDescriptor);
         Entity entity = Entity.from(entitySource, entityDesc, param);
-        int hash = System.identityHashCode(param);
-        EntityTracker.getInstance().addEntity(entity, hash);
+        EntityTracker.getInstance().addItem(identifier, entity, null);
     }
 
 
@@ -79,11 +82,12 @@ public class CallSiteVisitor extends ClassVisitor {
      * Utility method that boxes primitives and injects bytecode that will record the value using the recordParameter method. Boxing was used to have singular collection
      * method for recording.
      */
-    private void boxAndStore(MethodVisitor visitor, String callingClass, String callingMethod, String callingDescriptor, EntityCreation entity, Type type, int index) {
+    private void boxAndStore(MethodVisitor visitor, String callingClass, String callingMethod, String callingDescriptor, EntityCreation entity, Type type, int index, String identifier) {
         visitor.visitLdcInsn(callingClass);
         visitor.visitLdcInsn(callingMethod);
         visitor.visitLdcInsn(callingDescriptor);
         visitor.visitLdcInsn(entity.getEntity().toString());
+        visitor.visitLdcInsn(identifier);
         switch (type.getSort()) {
             case Type.BOOLEAN:
                 visitor.visitVarInsn(Opcodes.ILOAD, index);
@@ -127,10 +131,12 @@ public class CallSiteVisitor extends ClassVisitor {
 
         }
 
-        visitor.visitMethodInsn(Opcodes.INVOKESTATIC,
-                                CallSiteVisitor.class.getName().replace('.', '/'),
-                                "recordParameter",
-                                RECORD_PARAMS_DESCRIPTOR,
-                                false);
+        visitor.visitMethodInsn(
+                Opcodes.INVOKESTATIC,
+                CallSiteVisitor.class.getName().replace('.', '/'),
+                "recordParameter",
+                RECORD_PARAMS_DESCRIPTOR,
+                false
+        );
     }
 }

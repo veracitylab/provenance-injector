@@ -40,6 +40,7 @@ public class EntityFromArgTrackingTest {
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
         Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
+        Assert.assertNotNull(entity);
         Assert.assertEquals(expectedValue, entity.getValue());
         Assert.assertEquals(expectedType, entity.getType());
         Assert.assertEquals(expectedSource, entity.getSource());
@@ -53,6 +54,7 @@ public class EntityFromArgTrackingTest {
         EntityTracker tracker = EntityTracker.getInstance();
         Assert.assertEquals(1, tracker.getEntities().size());
         Entity entity = tracker.getEntities().entrySet().iterator().next().getValue();
+        Assert.assertNotNull(entity);
         Assert.assertEquals(expectedValue, entity.getValue());
     }
 

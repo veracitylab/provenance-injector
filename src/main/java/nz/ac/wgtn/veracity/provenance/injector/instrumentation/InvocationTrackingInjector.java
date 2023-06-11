@@ -1,12 +1,6 @@
 package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
 import nz.ac.wgtn.veracity.approv.jbind.Bindings;
-import nz.ac.wgtn.veracity.approv.jbind.EntityCreation;
-import nz.ac.wgtn.veracity.approv.jbind.EntityMapping;
-import nz.ac.wgtn.veracity.approv.jbind.EntityPropagation;
-import nz.ac.wgtn.veracity.approv.jbind.EntityRef;
-import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
-import nz.ac.wgtn.veracity.provenance.injector.tracker.EntityTracker;
 import nz.ac.wgtn.veracity.provenance.injector.tracker.InvocationTracker;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
 import nz.ac.wgtn.veracity.provenance.injector.util.URIGenerator;
