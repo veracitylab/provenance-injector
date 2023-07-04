@@ -43,6 +43,7 @@ public class CallSiteVisitor extends ClassVisitor {
         AtomicBoolean captureReturnValue = new AtomicBoolean(false);
 
         Set<EntityCreation> createEntities = Bindings.getEntityCreations(this.currentClass.replace('/', '.'), name, descriptor);
+
         if (!createEntities.isEmpty()) {
             createEntities.forEach(entity -> {
                 if (entity.getRef() == EntityRef.ARG) {

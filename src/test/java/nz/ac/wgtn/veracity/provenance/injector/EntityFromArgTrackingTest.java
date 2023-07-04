@@ -4,15 +4,14 @@ import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeClass;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeDatabaseClass;
 import nz.ac.wgtn.veracity.provenance.injector.tracker.EntityTracker;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class EntityFromArgTrackingTest {
@@ -24,6 +23,7 @@ public class EntityFromArgTrackingTest {
 
 
     @Before
+    @After
     public void clearEntityTracker() {
         EntityTracker.getInstance().nuke();
     }
