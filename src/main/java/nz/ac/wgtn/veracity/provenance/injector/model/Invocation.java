@@ -1,7 +1,6 @@
 package nz.ac.wgtn.veracity.provenance.injector.model;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import org.json.JSONObject;
 
 import java.net.URI;
 import java.util.Collection;
@@ -35,7 +34,10 @@ public class Invocation {
 
 
     public String toJSON() {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(this);
+        JSONObject json = new JSONObject();
+        json.put("caller", this.caller);
+        json.put("invocation", this.invocation);
+        json.put("activities", this.activities);
+        return json.toString();
     }
 }

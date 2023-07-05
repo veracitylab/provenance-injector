@@ -1,10 +1,8 @@
 package nz.ac.wgtn.veracity.provenance.injector;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import java.net.URI;
@@ -24,32 +22,22 @@ public class InvocationTrackingSerializationTest {
     @Test
     public void testJsonSerializationProducesCorrectObject() {
         String result = INVOCATION.toJSON();
-        JsonElement element = JsonParser.parseString(result);
-
-        assertTrue(element.isJsonObject());
-
-        JsonObject object = element.getAsJsonObject();
-
+        JSONObject object = new JSONObject(result);
         assertTrue(object.has("caller"));
         assertTrue(object.has("invocation"));
         assertTrue(object.has("activities"));
-
-        assertTrue(object.get("caller").isJsonPrimitive());
-        assertTrue(object.get("invocation").isJsonPrimitive());
-        assertTrue(object.get("activities").isJsonArray());
     }
 
     @Test
     public void testJsonSerializationProducesCorrectValues() {
         String result = INVOCATION.toJSON();
-        JsonElement element = JsonParser.parseString(result);
-        JsonObject object = element.getAsJsonObject();
+        JSONObject object = new JSONObject(result);
 
-        JsonArray expectedList = new JsonArray();
-        expectedList.add("https://com.example/app-provenance#InterestingActivity");
+        JSONArray expectedList = new JSONArray();
+        expectedList.put("https://com.example/app-provenance#InterestingActivity");
 
-        assertEquals("com.example.CallerClass/exampleMethod#()V", object.get("caller").getAsString());
-        assertEquals("com.example.InterestingClass/interestingMethod#()V", object.get("invocation").getAsString());
-        assertEquals(expectedList, object.get("activities").getAsJsonArray());
+        assertEquals("com.example.CallerClass/exampleMethod#()V", object.getString("caller"));
+        assertEquals("com.example.InterestingClass/interestingMethod#()V", object.getString("invocation"));
+        assertEquals(expectedList.toString(), object.getJSONArray("activities").toString());
     }
 }

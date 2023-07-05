@@ -33,10 +33,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
-            <scope>compile</scope>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20230618</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -95,14 +94,20 @@
                             </transformers>
                             <relocations>
                                 <relocation>
-                                    <pattern>com.google.gson</pattern>
-                                    <shadedPattern>shaded.google.gson</shadedPattern>
+                                    <pattern>org.json</pattern>
+                                    <shadedPattern>shaded.org.json</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern> org.objectweb.asm</pattern>
                                     <shadedPattern>shaded.org.objectweb.asm</shadedPattern>
                                 </relocation>
                             </relocations>
+                            <filters>
+                                <filter>
+                                    <artifact>org.json</artifact>
+                                    <excludes>org/json/XML*</excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
