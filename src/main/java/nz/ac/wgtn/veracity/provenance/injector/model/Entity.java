@@ -4,8 +4,6 @@ import java.net.URI;
 
 public class Entity {
 
-    private int code;
-
     private final URI source;
 
     private final URI type;
