@@ -1,5 +1,9 @@
 package nz.ac.wgtn.veracity.provenance.injector.model;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONPointer;
+
 import java.net.URI;
 
 public class Entity {
@@ -41,5 +45,24 @@ public class Entity {
 
     public void setTarget(Object target) {
         this.target = target;
+    }
+
+    public String toProvEntity() {
+        JSONObject entity = new JSONObject();
+        entity.put("id", System.identityHashCode(this.value));
+
+        JSONArray attrs = new JSONArray();
+
+        String[] typeRepr = this.type.toString().split("/");
+        if (typeRepr.length >= 2) {
+            JSONObject provType = new JSONObject();
+            provType.put("prov:type", typeRepr[typeRepr.length - 1]);
+            attrs.put(provType);
+        }
+
+        entity.put("attributes", attrs);
+
+
+        return entity.toString();
     }
 }
