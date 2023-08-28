@@ -17,6 +17,24 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_BOOL;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_BYTE;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_CHAR;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_DOUBLE;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_FLOAT;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_INTEGER;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_LONG;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_SHORT;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.D_BOOL;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.D_BYTE;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.D_CHAR;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.D_DOUBLE;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.D_FLOAT;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.D_INTEGER;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.D_LONG;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.D_SHORT;
+import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.M_VO;
+
 public class CallSiteVisitor extends ClassVisitor {
 
     private String currentClass = null;
@@ -77,7 +95,9 @@ public class CallSiteVisitor extends ClassVisitor {
 
     /**
      * Utility method that boxes primitives and injects bytecode that will record the value using the recordParameter method. Boxing was used to have singular collection
-     * method for recording.
+     * method for recording. The values are obtained from the local variables, which is where method arguments are
+     * located. The index is required to prevent "off-by-one" errors when recording values from static methods, as
+     * dynamic methods store a reference to "this" in index 0.
      */
     private void boxAndStore(MethodVisitor visitor, String callingClass, String callingMethod, String callingDescriptor, EntityCreation entity, Type type, int index, String identifier) {
         visitor.visitLdcInsn(callingClass);
@@ -85,38 +105,39 @@ public class CallSiteVisitor extends ClassVisitor {
         visitor.visitLdcInsn(callingDescriptor);
         visitor.visitLdcInsn(entity.getEntity().toString());
         visitor.visitLdcInsn(identifier);
+
         switch (type.getSort()) {
             case Type.BOOLEAN:
                 visitor.visitVarInsn(Opcodes.ILOAD, index);
-                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_BOOL, M_VO, D_BOOL, false);
                 break;
             case Type.CHAR:
                 visitor.visitVarInsn(Opcodes.ILOAD, index);
-                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_CHAR, M_VO, D_CHAR, false);
                 break;
             case Type.BYTE:
                 visitor.visitVarInsn(Opcodes.ILOAD, index);
-                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_BYTE, M_VO, D_BYTE, false);
                 break;
             case Type.SHORT:
                 visitor.visitVarInsn(Opcodes.ILOAD, index);
-                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_SHORT, M_VO, D_SHORT, false);
                 break;
             case Type.INT:
                 visitor.visitVarInsn(Opcodes.ILOAD, index);
-                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_INTEGER, M_VO, D_INTEGER, false);
                 break;
             case Type.FLOAT:
                 visitor.visitVarInsn(Opcodes.FLOAD, index);
-                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_FLOAT, M_VO, D_FLOAT, false);
                 break;
             case Type.LONG:
                 visitor.visitVarInsn(Opcodes.LLOAD, index);
-                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_LONG, M_VO, D_LONG, false);
                 break;
             case Type.DOUBLE:
                 visitor.visitVarInsn(Opcodes.DLOAD, index);
-                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_DOUBLE, M_VO, D_DOUBLE, false);
                 break;
             case Type.ARRAY:
                 throw new UnsupportedOperationException("Array capturing not yet supported");
