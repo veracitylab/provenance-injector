@@ -37,6 +37,17 @@
             <artifactId>json</artifactId>
             <version>20230618</version>
         </dependency>
+
+        <!-- for JEE specific bindings - eventually to be moved into separate JEE module  -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
