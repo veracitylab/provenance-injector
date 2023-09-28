@@ -1,4 +1,4 @@
-package nz.ac.wgtn.veracity.provenance.injector.tracker;
+package nz.ac.wgtn.veracity.provenance.injector.serializer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,28 +18,25 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-public class ProvSerializerTest {
+public class ProvDmJsonSerializerTest {
 
-    private static final URI DEFAULT_SOURCE = URI.create("http://nz.ac.wgtn.veracity.provenance.example/exampleMethod#()V");
     private static final URI DEFAULT_TYPE = URI.create("http://veracity.wgtn.ac.nz/app-provenance#Database");
     private static final Object DEFAULT_VALUE = "Hello!";
-    private static final Entity DEFAULT_ENTITY = Entity.from(DEFAULT_SOURCE, DEFAULT_TYPE.toString(), DEFAULT_VALUE);
-
+    private static final Entity DEFAULT_ENTITY = Entity.from(DEFAULT_TYPE.toString(), DEFAULT_VALUE);
     private static final ObjectMapper mapper = new ObjectMapper();
-
     private static JsonSchema schema;
 
 
     @BeforeClass
     public static void setUpAll() {
         JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V4);
-        InputStream is = ProvSerializerTest.class.getClassLoader().getResourceAsStream("schema.json");
+        InputStream is = ProvDmJsonSerializerTest.class.getClassLoader().getResourceAsStream("schema.json");
         schema = factory.getSchema(is);
     }
 
     @Test
     public void testEntityConformsToSchema() throws JsonProcessingException {
-        String serialized = ProvSerializer.serializeEntities(List.of(DEFAULT_ENTITY));
+        String serialized = ProvDmJsonSerializer.serializeEntities(List.of(DEFAULT_ENTITY));
 
         JsonNode tree = mapper.readTree(serialized);
         Set<ValidationMessage> errors = schema.validate(tree);
@@ -48,7 +45,7 @@ public class ProvSerializerTest {
 
     @Test
     public void testActivityConformsToSchema() throws JsonProcessingException {
-        String serialized = ProvSerializer.serializeActivity(URI.create("http://exampleActivity"));
+        String serialized = ProvDmJsonSerializer.serializeActivity(URI.create("http://exampleActivity"));
 
         JsonNode tree = mapper.readTree(serialized);
         Set<ValidationMessage> errors = schema.validate(tree);

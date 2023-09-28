@@ -1,5 +1,6 @@
 package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
+import nz.ac.wgtn.veracity.provenance.injector.tracker2.GlobalProvenanceTracker;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 
@@ -49,6 +50,10 @@ public class ProvenanceAgent {
      * @param instrumentation instrumentation instance
      */
     private static void install(Instrumentation instrumentation) {
+        // Construct cache to be used by instrumentation classes
+        AssociationCache cache = new AssociationCache(new GlobalProvenanceTracker());
+        AssociationCacheRegistry.registerCache(cache);
+
         instrumentation.addTransformer(new ClassFileTransformer() {
             @Override
             public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
@@ -58,6 +63,7 @@ public class ProvenanceAgent {
 
                 ClassReader classReader = new ClassReader(classfileBuffer);
                 ClassWriter writer = new SafeClassWriter(classReader, loader, ClassWriter.COMPUTE_FRAMES);
+
                 try {
                     CallSiteVisitor visitor = new CallSiteVisitor(writer);
                     classReader.accept(visitor, ClassReader.EXPAND_FRAMES);
@@ -65,6 +71,7 @@ public class ProvenanceAgent {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
                 return classfileBuffer;
             }
         }, true);

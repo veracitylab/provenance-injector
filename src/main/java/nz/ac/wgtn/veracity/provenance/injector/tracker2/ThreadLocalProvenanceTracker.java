@@ -1,6 +1,10 @@
 package nz.ac.wgtn.veracity.provenance.injector.tracker2;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -10,22 +14,22 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ThreadLocalProvenanceTracker<T> implements ProvenanceTracker<T> {
 
 
-    private ThreadLocal<List<T>> trackedData = new ThreadLocal<>();
-    private ThreadLocal<String> id = new ThreadLocal<>();
+    private final ThreadLocal<List<T>> trackedData = new ThreadLocal<>();
+    private final ThreadLocal<String> id = new ThreadLocal<>();
     private static final AtomicLong ID_GENERATOR = new AtomicLong();
-    private Map<String,List<T>> outbox = Collections.synchronizedMap(new LinkedHashMap<>());;
+    private final Map<String,List<T>> outbox = Collections.synchronizedMap(new LinkedHashMap<>());
 
     public String start() {
-        String ID = "" + ID_GENERATOR.incrementAndGet();
-        this.id.set(ID);
+        String generatedId = "" + ID_GENERATOR.incrementAndGet();
+        this.id.set(generatedId);
         this.trackedData.set(new ArrayList<>());
-        return ID;
+        return generatedId;
     }
 
     public void finish() {
         this.outbox.put(id.get(),Collections.unmodifiableList(trackedData.get()));
-        this.trackedData.set(null);
-        this.id.set(null);
+        this.trackedData.remove();
+        this.id.remove();
     }
 
     public void track(T data) {

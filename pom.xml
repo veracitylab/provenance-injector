@@ -55,6 +55,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>2.1.214</version>
@@ -85,8 +91,9 @@
                 <configuration>
                     <includes>
                         <include>**/*Test.java</include>
+                        <include>**/*TestCase.java</include>
                     </includes>
-                    <argLine>-Djdk.attach.allowAttachSelf=true</argLine>
+                    <argLine>-javaagent:${project.build.directory}/provenance-agent.jar</argLine>
                 </configuration>
             </plugin>
 
@@ -111,7 +118,6 @@
                                         <Agent-Class>nz.ac.wgtn.veracity.provenance.injector.instrumentation.ProvenanceAgent</Agent-Class>
                                         <Can-Redefine-Classes>true</Can-Redefine-Classes>
                                         <Can-Retransform-Classes>true</Can-Retransform-Classes>
-                                        <Boot-Class-Path>provenance-agent.jar</Boot-Class-Path>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

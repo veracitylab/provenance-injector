@@ -4,15 +4,12 @@ import nz.ac.wgtn.veracity.approv.jbind.Bindings;
 import nz.ac.wgtn.veracity.approv.jbind.EntityCreation;
 import nz.ac.wgtn.veracity.approv.jbind.EntityRef;
 import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
-import nz.ac.wgtn.veracity.provenance.injector.tracker.EntityTracker;
-import nz.ac.wgtn.veracity.provenance.injector.util.URIGenerator;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
-import java.net.URI;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,10 +34,8 @@ import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.M_VO;
 
 public class CallSiteVisitor extends ClassVisitor {
 
+    private static final String RECORD_PARAMS_DESCRIPTOR = "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V";
     private String currentClass = null;
-
-    private static final String RECORD_PARAMS_DESCRIPTOR = "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V";
-
 
     protected CallSiteVisitor(ClassWriter writer) {
         super(Opcodes.ASM9, writer);
@@ -72,12 +67,12 @@ public class CallSiteVisitor extends ClassVisitor {
                     int offset = (access & Opcodes.ACC_STATIC) != 0 ? 0 : 1;
                     int varTableIndex = entity.getRefIndex();
                     Type arg = argTypes[varTableIndex];
-                    boxAndStore(visitor, this.currentClass, name, descriptor, entity, arg, varTableIndex + offset, taint);
+                    boxAndStore(visitor, entity, arg, varTableIndex + offset, taint);
                 }
             });
         }
 
-        return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor, captureReturnValue.get(), taint);
+        return new InvocationTrackingInjector(visitor, this.currentClass, captureReturnValue.get(), taint);
     }
 
 
@@ -86,10 +81,9 @@ public class CallSiteVisitor extends ClassVisitor {
      *
      * @param param recorded parameter
      */
-    public static void recordParameter(String callingClass, String callingMethod, String callingDescriptor, String entityDesc, String identifier, Object param) {
-        URI entitySource = URIGenerator.createMethodDescriptor(callingClass, callingMethod, callingDescriptor);
-        Entity entity = Entity.from(entitySource, entityDesc, param);
-        EntityTracker.getInstance().addItem(identifier, entity, null);
+    public static void recordParameter(String entityDesc, String identifier, Object param) {
+        Entity entity = Entity.from(entityDesc, param);
+        AssociationCacheRegistry.getCache().cacheEntity(identifier, entity, null);
     }
 
 
@@ -99,10 +93,7 @@ public class CallSiteVisitor extends ClassVisitor {
      * located. The index is required to prevent "off-by-one" errors when recording values from static methods, as
      * dynamic methods store a reference to "this" in index 0.
      */
-    private void boxAndStore(MethodVisitor visitor, String callingClass, String callingMethod, String callingDescriptor, EntityCreation entity, Type type, int index, String identifier) {
-        visitor.visitLdcInsn(callingClass);
-        visitor.visitLdcInsn(callingMethod);
-        visitor.visitLdcInsn(callingDescriptor);
+    private void boxAndStore(MethodVisitor visitor, EntityCreation entity, Type type, int index, String identifier) {
         visitor.visitLdcInsn(entity.getEntity().toString());
         visitor.visitLdcInsn(identifier);
 

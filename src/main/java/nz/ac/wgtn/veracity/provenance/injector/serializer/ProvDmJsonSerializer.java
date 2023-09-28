@@ -1,4 +1,4 @@
-package nz.ac.wgtn.veracity.provenance.injector.tracker;
+package nz.ac.wgtn.veracity.provenance.injector.serializer;
 
 import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * This class is responsible for serializing Prov-DM objects and behaviours
  */
-public class ProvSerializer {
+public class ProvDmJsonSerializer {
 
 
     public static String serializeEntities(Collection<Entity> entities) {

@@ -8,19 +8,14 @@ import java.util.HashSet;
 
 
 /**
- * This class will be a tuple of URI's containing the calling method, the method instruction and the
- * associated activity.
+ * This class represents a bundle of activities and their associated entities
  */
 public class Invocation {
-    private final URI caller;
-    private final URI invocation;
     private final Collection<URI> activities;
     private final Collection<Entity> associatedEntities;
     private final Instant generationTime;
 
-    private Invocation(URI caller, URI invocation, Collection<URI> activities) {
-        this.caller = caller;
-        this.invocation = invocation;
+    private Invocation(Collection<URI> activities) {
         this.activities = activities;
         this.generationTime = Instant.now();
         this.associatedEntities = new HashSet<>();
@@ -49,12 +44,10 @@ public class Invocation {
     /**
      * Creates a new invocation object
      *
-     * @param caller     caller of the method with provenance activities
-     * @param invocation method with provenance activities bound
      * @param activities activities related to the method invocation
      * @return Invocation object as a 3-URI tuple
      */
-    public static Invocation fromMethodIsn(URI caller, URI invocation, Collection<URI> activities) {
-        return new Invocation(caller, invocation, activities);
+    public static Invocation fromMethodIsn(Collection<URI> activities) {
+        return new Invocation(activities);
     }
 }
