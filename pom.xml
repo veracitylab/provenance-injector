@@ -37,10 +37,27 @@
             <artifactId>json</artifactId>
             <version>20230618</version>
         </dependency>
+
+        <!-- for JEE specific bindings - eventually to be moved into separate JEE module  -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -74,8 +91,9 @@
                 <configuration>
                     <includes>
                         <include>**/*Test.java</include>
+                        <include>**/*TestCase.java</include>
                     </includes>
-                    <argLine>-Djdk.attach.allowAttachSelf=true</argLine>
+                    <argLine>-javaagent:${project.build.directory}/provenance-agent.jar</argLine>
                 </configuration>
             </plugin>
 
@@ -100,7 +118,6 @@
                                         <Agent-Class>nz.ac.wgtn.veracity.provenance.injector.instrumentation.ProvenanceAgent</Agent-Class>
                                         <Can-Redefine-Classes>true</Can-Redefine-Classes>
                                         <Can-Retransform-Classes>true</Can-Retransform-Classes>
-                                        <Boot-Class-Path>provenance-agent.jar</Boot-Class-Path>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

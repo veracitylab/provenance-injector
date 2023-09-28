@@ -56,4 +56,8 @@ public class SomeClass {
     public void somethingWithArg(Object item) {
 
     }
+
+    public String somethingFunny() {
+        return "The funny";
+    }
 }

@@ -2,17 +2,14 @@ package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
 import nz.ac.wgtn.veracity.approv.jbind.Bindings;
 import nz.ac.wgtn.veracity.approv.jbind.EntityCreation;
-import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
-import nz.ac.wgtn.veracity.provenance.injector.tracker.EntityTracker;
-import nz.ac.wgtn.veracity.provenance.injector.tracker.InvocationTracker;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
-import nz.ac.wgtn.veracity.provenance.injector.util.URIGenerator;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_BOOL;
@@ -39,25 +36,19 @@ import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.M_VO;
  */
 public class InvocationTrackingInjector extends MethodVisitor {
 
-    private static final String RECORD_DESCRIPTOR = "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V";
+    private static final String RECORD_DESCRIPTOR = "(Ljava/lang/Object;Ljava/lang/String;)V";
 
     private final MethodVisitor visitor;
     private final String callingClass;
-    private final String callingMethod;
-
-
-    private final String callingDescriptor;
 
     private final boolean trackMethodReturn;
 
     private final String taint;
 
-    public InvocationTrackingInjector(MethodVisitor visitor, String callingClass, String callingMethod, String callingDescriptor, boolean trackMethodReturn, String taint) {
+    public InvocationTrackingInjector(MethodVisitor visitor, String callingClass, boolean trackMethodReturn, String taint) {
         super(Opcodes.ASM9, visitor);
         this.visitor = visitor;
         this.callingClass = callingClass;
-        this.callingMethod = callingMethod;
-        this.callingDescriptor = callingDescriptor;
         this.trackMethodReturn = trackMethodReturn;
         this.taint = taint;
     }
@@ -98,12 +89,6 @@ public class InvocationTrackingInjector extends MethodVisitor {
             }
 
             visitor.visitLdcInsn(activities.stream().map(URI::toString).collect(Collectors.joining(";")));
-            visitor.visitLdcInsn(this.callingClass);
-            visitor.visitLdcInsn(this.callingMethod);
-            visitor.visitLdcInsn(this.callingDescriptor);
-            visitor.visitLdcInsn(owner);
-            visitor.visitLdcInsn(name);
-            visitor.visitLdcInsn(descriptor);
 
             // Static call to instrumentation classes.
             visitor.visitMethodInsn(Opcodes.INVOKESTATIC,
@@ -215,39 +200,12 @@ public class InvocationTrackingInjector extends MethodVisitor {
     /**
      * Records an invocation of a method instruction that is associated with a particular method, storing it in the
      * invocation tracker
-     *
-     * @param callingClass      class calling a provenance activity method
-     * @param callingMethod     method of the calling class calling the activity method
-     * @param callingDescriptor descriptor of the method calling the activity method
-     * @param invOwner          activity method class
-     * @param invMethod         activity method name
-     * @param invDescriptor     activity method descriptor
      */
-    public static void recordActivity(
-            Object capturedReturn,
-            String activities,
-            String callingClass,
-            String callingMethod,
-            String callingDescriptor,
-            String invOwner,
-            String invMethod,
-            String invDescriptor
-    ) {
+    public static void recordActivity(Object capturedReturn, String activities) {
         Set<URI> detectedActivities = Arrays.stream(activities.split(";")).map(URI::create).collect(Collectors.toSet());
 
-        URI caller = URIGenerator.createMethodDescriptor(callingClass, callingMethod, callingDescriptor);
-        URI invoked = URIGenerator.createMethodDescriptor(invOwner, invMethod, invDescriptor);
-
-        Invocation inv = Invocation.fromMethodIsn(caller, invoked, detectedActivities);
-        Set<Entity> associatedEntities = EntityTracker.getInstance().lookupFromTarget(capturedReturn);
-        System.out.printf("DEBUG: Associated entities size: %s%n", associatedEntities.size());
-
-        if (associatedEntities != null) {
-            inv.associateEntities(associatedEntities);
-        }
-
-        InvocationTracker tracker = InvocationTracker.getInstance();
-        tracker.addInvocation(inv);
+        Invocation inv = Invocation.fromMethodIsn(detectedActivities);
+        AssociationCacheRegistry.getCache().cacheInvocation(inv, capturedReturn);
     }
 
     /**
@@ -258,7 +216,7 @@ public class InvocationTrackingInjector extends MethodVisitor {
      *               with a respective entity.
      */
     public static void captureTarget(Object target, String taint) {
-        EntityTracker.getInstance().addItem(taint, null, target);
+        AssociationCacheRegistry.getCache().cacheEntity(taint, null, target);
         System.out.printf("DEBUG: Got target of type: %s%n", target.getClass().getName());
         System.out.printf("DEBUG: Return value is: %s%n", target);
     }
