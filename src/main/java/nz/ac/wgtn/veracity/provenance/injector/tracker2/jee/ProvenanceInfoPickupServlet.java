@@ -1,5 +1,6 @@
 package nz.ac.wgtn.veracity.provenance.injector.tracker2.jee;
 
+import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
 import nz.ac.wgtn.veracity.provenance.injector.tracker2.ProvenanceTracker;
 import nz.ac.wgtn.veracity.provenance.injector.tracker2.ThreadLocalProvenanceTracker;
 
@@ -16,23 +17,25 @@ import java.util.List;
  */
 public abstract class ProvenanceInfoPickupServlet extends HttpServlet {
 
-    protected static final ProvenanceTracker tracker = new ThreadLocalProvenanceTracker();
+    protected static final ProvenanceTracker<Invocation> tracker = new ThreadLocalProvenanceTracker<>();
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
         String id = request.getPathInfo();
-        if (id==null || id.length()==0) {
-            PrintWriter out = response.getWriter();
-            // set up for monitoring in web browser -- to check that tracing takes place
-            // and has been installed correctly
-            response.setContentType(getContentType());
-            List data = tracker.pickup(id);
-            encode(out,data);
-            tracker.cull(id);
-        }
-        else {
+
+        if (id == null || id.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        try(PrintWriter writer = response.getWriter()) {
+            response.setContentType(getContentType());
+            List<Invocation> data = tracker.pickup(id);
+            encode(writer, data);
+            tracker.cull(id);
+
+        } catch (IOException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -50,7 +53,7 @@ public abstract class ProvenanceInfoPickupServlet extends HttpServlet {
      * @param out the stream to write to
      * @param provenanceData the data to write
      */
-    protected abstract void encode(PrintWriter out, List provenanceData) throws IOException ;
+    protected abstract void encode(PrintWriter out, List<Invocation> provenanceData) throws IOException ;
 
     /**
      * Get the content type, like application/json
