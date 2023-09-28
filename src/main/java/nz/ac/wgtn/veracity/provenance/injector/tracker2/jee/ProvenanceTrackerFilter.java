@@ -1,5 +1,6 @@
 package nz.ac.wgtn.veracity.provenance.injector.tracker2.jee;
 
+import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
 import nz.ac.wgtn.veracity.provenance.injector.tracker2.ProvenanceTracker;
 import nz.ac.wgtn.veracity.provenance.injector.tracker2.ThreadLocalProvenanceTracker;
 
@@ -21,7 +22,7 @@ import java.io.IOException;
  */
 public abstract class ProvenanceTrackerFilter implements Filter  {
 
-    protected static final ProvenanceTracker tracker = new ThreadLocalProvenanceTracker();
+    protected static final ProvenanceTracker<Invocation> tracker = new ThreadLocalProvenanceTracker<>();
 
     /**
      * Specify whether this is an application request, and not a request to get collected provevance info.
@@ -31,11 +32,11 @@ public abstract class ProvenanceTrackerFilter implements Filter  {
      */
     protected abstract boolean isApplicationRequest(ServletRequest request) ;
 
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException {
         boolean isApplicationRequest = isApplicationRequest(request);
         if (isApplicationRequest) {
-            String ID = tracker.start();
-            ((HttpServletResponse) response).addHeader(Constants.PROVENANCE_HEADER, ID);
+            String id = tracker.start();
+            ((HttpServletResponse) response).addHeader(Constants.PROVENANCE_HEADER, id);
         }
 
         try {
