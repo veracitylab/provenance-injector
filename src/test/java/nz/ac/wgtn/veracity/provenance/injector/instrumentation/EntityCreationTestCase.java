@@ -2,25 +2,25 @@ package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
 import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
 import nz.ac.wgtn.veracity.provenance.injector.sampleclasses.SomeClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class EntityCreationTestCase {
+class EntityCreationTestCase {
 
     private AssociationCache cache;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         cache = AssociationCacheRegistry.getCache();
         cache.clear();
     }
 
     @Test
-    public void testSingleEntityCachedWithStaticInvocation() {
+    void testSingleEntityCachedWithStaticInvocation() {
         String expected = "theArg";
 
         SomeClass.doSomethingStatically(expected);
@@ -32,7 +32,7 @@ public class EntityCreationTestCase {
     }
 
     @Test
-    public void testSingleEntityCachedWithStaticInvocationIfDuplicateValue() {
+    void testSingleEntityCachedWithStaticInvocationIfDuplicateValue() {
         String expected = "theArg";
 
         SomeClass.doSomethingStatically(expected);
@@ -45,7 +45,7 @@ public class EntityCreationTestCase {
     }
 
     @Test
-    public void testSingleEntityCachedWithDynamicInvocation() {
+    void testSingleEntityCachedWithDynamicInvocation() {
         SomeClass someClass = new SomeClass();
         String expected = "theArg";
 
@@ -58,7 +58,7 @@ public class EntityCreationTestCase {
     }
 
     @Test
-    public void testSingleEntityCachedWithDynamicInvocationIfDuplicateValue() {
+    void testSingleEntityCachedWithDynamicInvocationIfDuplicateValue() {
         SomeClass someClass = new SomeClass();
         String expected = "theArg";
 
@@ -72,7 +72,7 @@ public class EntityCreationTestCase {
     }
 
     @Test
-    public void testTrackingEntitySingleBool() {
+    void testTrackingEntitySingleBool() {
         SomeClass someClass = new SomeClass();
         boolean expectedVal = true;
 
@@ -85,7 +85,7 @@ public class EntityCreationTestCase {
     }
 
     @Test
-    public void testTrackingEntitySingleChar() {
+    void testTrackingEntitySingleChar() {
         SomeClass someClass = new SomeClass();
         char expectedVal = 't';
 
@@ -98,7 +98,7 @@ public class EntityCreationTestCase {
     }
 
     @Test
-    public void testTrackingEntitySingleByte() {
+    void testTrackingEntitySingleByte() {
         SomeClass someClass = new SomeClass();
         byte expectedVal = 0x16;
 
@@ -111,7 +111,7 @@ public class EntityCreationTestCase {
     }
 
     @Test
-    public void testTrackingEntitySingleShort() {
+    void testTrackingEntitySingleShort() {
         SomeClass someClass = new SomeClass();
         short expectedVal = 2;
 
@@ -124,7 +124,7 @@ public class EntityCreationTestCase {
     }
 
     @Test
-    public void testTrackingEntitySingleInt() {
+    void testTrackingEntitySingleInt() {
         SomeClass someClass = new SomeClass();
         int expectedVal = 2;
 
@@ -137,7 +137,7 @@ public class EntityCreationTestCase {
     }
 
     @Test
-    public void testTrackingEntitySingleFloat() {
+    void testTrackingEntitySingleFloat() {
         SomeClass someClass = new SomeClass();
         float expectedVal = 2F;
 
@@ -150,7 +150,7 @@ public class EntityCreationTestCase {
     }
 
     @Test
-    public void testTrackingEntitySingleLong() {
+    void testTrackingEntitySingleLong() {
         SomeClass someClass = new SomeClass();
         long expectedVal = 2L;
 
@@ -163,7 +163,7 @@ public class EntityCreationTestCase {
     }
 
     @Test
-    public void testTrackingEntitySingleDouble() {
+    void testTrackingEntitySingleDouble() {
         SomeClass someClass = new SomeClass();
         double expectedVal = 2D;
 
@@ -176,7 +176,7 @@ public class EntityCreationTestCase {
     }
 
     @Test
-    public void testTrackingEntitySingleObject() {
+    void testTrackingEntitySingleObject() {
         SomeClass someClass = new SomeClass();
         Object expectedVal = "the object";
 

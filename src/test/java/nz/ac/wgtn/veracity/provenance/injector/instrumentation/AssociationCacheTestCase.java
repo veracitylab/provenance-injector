@@ -2,25 +2,25 @@ package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
 import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
 import nz.ac.wgtn.veracity.provenance.injector.tracker2.NoopProvenanceTracker;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AssociationCacheTestCase {
+class AssociationCacheTestCase {
 
     private AssociationCache cache;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         cache = new AssociationCache(new NoopProvenanceTracker());
     }
 
     @Test
-    public void testCachingAnEntityWithNoTargetWillNotHaveAnyAssociations() {
+    void testCachingAnEntityWithNoTargetWillNotHaveAnyAssociations() {
         Entity entity = Entity.from("caller", "the object");
         String taint = UUID.randomUUID().toString();
 
@@ -30,7 +30,7 @@ public class AssociationCacheTestCase {
     }
 
     @Test
-    public void testCachingAnEntityThenATargetWithSameTaintWillAssociateThatTarget() {
+    void testCachingAnEntityThenATargetWithSameTaintWillAssociateThatTarget() {
         Entity entity = Entity.from("caller", "the object");
         String taint = UUID.randomUUID().toString();
         String target = "the target";
@@ -46,7 +46,7 @@ public class AssociationCacheTestCase {
     }
 
     @Test
-    public void testCachingAEntityThenATargetWithDifferentTaintWillNotAssociateThatTarget() {
+    void testCachingAEntityThenATargetWithDifferentTaintWillNotAssociateThatTarget() {
         Entity entity = Entity.from("caller", "the object");
         String taint = UUID.randomUUID().toString();
         String target = "the target";
@@ -62,7 +62,7 @@ public class AssociationCacheTestCase {
     }
 
     @Test
-    public void testCachingATargetButNoEntityWillNotPopulateEntityCache() {
+    void testCachingATargetButNoEntityWillNotPopulateEntityCache() {
         String taint = UUID.randomUUID().toString();
         String target = "the target";
 
@@ -71,7 +71,7 @@ public class AssociationCacheTestCase {
     }
 
     @Test
-    public void testCachingATargetThenEntityWithSameTaintWillPopulateEntityCache() {
+    void testCachingATargetThenEntityWithSameTaintWillPopulateEntityCache() {
         Entity entity = Entity.from("caller", "the object");
         String taint = UUID.randomUUID().toString();
         String target = "the target";
@@ -88,7 +88,7 @@ public class AssociationCacheTestCase {
     }
 
     @Test
-    public void testCachingATargetThenEntityWithDifferentTaintWillPopulateEntityCacheButNotAssociateTheFirstTarget() {
+    void testCachingATargetThenEntityWithDifferentTaintWillPopulateEntityCacheButNotAssociateTheFirstTarget() {
         Entity entity = Entity.from("caller", "the object");
         String taint = UUID.randomUUID().toString();
         String target = "the target";
