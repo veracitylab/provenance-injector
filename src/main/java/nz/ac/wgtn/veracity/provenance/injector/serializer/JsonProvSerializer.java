@@ -1,10 +1,13 @@
 package nz.ac.wgtn.veracity.provenance.injector.serializer;
 
+import nz.ac.wgtn.veracity.provenance.injector.model.Activity;
 import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -26,38 +29,51 @@ public class JsonProvSerializer implements ProvSerializer {
 
     private JSONObject serializeInvocation(Invocation invocation) {
         JSONObject entities = serializeEntities(invocation.getAssociatedEntities());
-        //TODO: Activities
+        JSONObject activities = serializeActivities(invocation.getActivities());
         //TODO: Generations
         //TODO: Usages
 
         JSONObject inv = new JSONObject();
         inv.put("entity", entities);
-        //TODO: Activities
+        inv.put("activity", activities);
         //TODO: Generations
         //TODO: Usages
         return inv;
     }
 
-    private JSONObject serializeEntities(Collection<Entity> entities) {
-        JSONObject wrapper = new JSONObject();
-        entities.forEach(entity -> wrapper.put(entity.getId().toString(), serializeEntity(entity)));
-        return wrapper;
-    }
-
     private JSONObject serializeEntity(Entity entity) {
         JSONObject object = new JSONObject();
-        String[] typeRepr = entity.getType().toString().split("/");
-
-        if (typeRepr.length > 1) {
-            object.put("prov:type", typeRepr[typeRepr.length - 1]);
-        }
-
+        // Only add the prov:type object if the type representation is valid
+        JsonProvSerializer.getProvType(entity.getType()).ifPresent(type -> object.put("prov:type", type));
         object.put("prov:value", entity.getValue().toString());
+
         return object;
     }
 
-    private JSONObject serializeActivity() {
+    private JSONObject serializeEntities(Collection<Entity> entities) {
+        JSONObject wrapper = new JSONObject();
+        entities.forEach(entity -> wrapper.put(entity.getId().toString(), serializeEntity(entity)));
 
-        return null;
+        return wrapper;
+    }
+
+    private JSONObject serializeActivities(Collection<Activity> activities) {
+        JSONObject wrapper = new JSONObject();
+        activities.forEach(activity -> wrapper.put(activity.getId(), serializeActivity(activity)));
+
+        return wrapper;
+    }
+
+    private JSONObject serializeActivity(Activity activity) {
+        JSONObject object = new JSONObject();
+
+        object.put("prov:type", activity.getType());
+        object.put("prov:endTime", activity.getEndTime().toString());
+
+        return object;
+    }
+
+    private static Optional<String> getProvType(URI type) {
+        return Optional.ofNullable(type.getRawFragment());
     }
 }

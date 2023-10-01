@@ -13,15 +13,15 @@ public class Entity {
 
     private Object target;
 
-    private Entity(URI type, Object value) {
+    private Entity(URI type, Object value, Object target) {
         this.id = System.identityHashCode(value);
         this.value = value;
         this.type = type;
-        this.target = null;
+        this.target = target;
     }
 
-    public static Entity from(String type, Object value) {
-        return new Entity(URI.create(type), value);
+    public static Entity create(String type, Object value) {
+        return new Entity(URI.create(type), value, null);
     }
 
     public Integer getId() {

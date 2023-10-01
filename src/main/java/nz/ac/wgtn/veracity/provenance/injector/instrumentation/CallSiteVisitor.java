@@ -82,7 +82,7 @@ public class CallSiteVisitor extends ClassVisitor {
      * @param param recorded parameter
      */
     public static void recordParameter(String entityDesc, String identifier, Object param) {
-        Entity entity = Entity.from(entityDesc, param);
+        Entity entity = Entity.create(entityDesc, param);
         AssociationCacheRegistry.getCache().cacheEntity(identifier, entity, null);
     }
 

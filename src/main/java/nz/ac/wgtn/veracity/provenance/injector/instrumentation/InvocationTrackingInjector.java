@@ -2,6 +2,7 @@ package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
 import nz.ac.wgtn.veracity.approv.jbind.Bindings;
 import nz.ac.wgtn.veracity.approv.jbind.EntityCreation;
+import nz.ac.wgtn.veracity.provenance.injector.model.Activity;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -9,6 +10,7 @@ import org.objectweb.asm.Type;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,10 +39,8 @@ import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.M_VO;
 public class InvocationTrackingInjector extends MethodVisitor {
 
     private static final String RECORD_DESCRIPTOR = "(Ljava/lang/Object;Ljava/lang/String;)V";
-
     private final MethodVisitor visitor;
     private final String callingClass;
-
     private final boolean trackMethodReturn;
 
     private final String taint;
@@ -88,7 +88,8 @@ public class InvocationTrackingInjector extends MethodVisitor {
                 visitor.visitInsn(Opcodes.ACONST_NULL);
             }
 
-            visitor.visitLdcInsn(activities.stream().map(URI::toString).collect(Collectors.joining(";")));
+            //TODO: Change this instruction to create a new string array to prevent costly joining operations during instrumentation
+            visitor.visitLdcInsn(activities.stream().map(URI::getFragment).collect(Collectors.joining(";")));
 
             // Static call to instrumentation classes.
             visitor.visitMethodInsn(Opcodes.INVOKESTATIC,
@@ -201,10 +202,11 @@ public class InvocationTrackingInjector extends MethodVisitor {
      * Records an invocation of a method instruction that is associated with a particular method, storing it in the
      * invocation tracker
      */
-    public static void recordActivity(Object capturedReturn, String activities) {
-        Set<URI> detectedActivities = Arrays.stream(activities.split(";")).map(URI::create).collect(Collectors.toSet());
-
-        Invocation inv = Invocation.fromMethodIsn(detectedActivities);
+    public static void recordActivity(Object capturedReturn, String activityTypes) {
+        List<Activity> activities = Arrays.stream(activityTypes.split(";"))
+                .map(Activity::create)
+                .collect(Collectors.toList());
+        Invocation inv = Invocation.create(activities);
         AssociationCacheRegistry.getCache().cacheInvocation(inv, capturedReturn);
     }
 

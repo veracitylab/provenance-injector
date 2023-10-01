@@ -21,7 +21,7 @@ class AssociationCacheTestCase {
 
     @Test
     void testCachingAnEntityWithNoTargetWillNotHaveAnyAssociations() {
-        Entity entity = Entity.from("caller", "the object");
+        Entity entity = Entity.create("caller", "the object");
         String taint = UUID.randomUUID().toString();
 
         cache.cacheEntity(taint, entity, null);
@@ -31,7 +31,7 @@ class AssociationCacheTestCase {
 
     @Test
     void testCachingAnEntityThenATargetWithSameTaintWillAssociateThatTarget() {
-        Entity entity = Entity.from("caller", "the object");
+        Entity entity = Entity.create("caller", "the object");
         String taint = UUID.randomUUID().toString();
         String target = "the target";
 
@@ -47,7 +47,7 @@ class AssociationCacheTestCase {
 
     @Test
     void testCachingAEntityThenATargetWithDifferentTaintWillNotAssociateThatTarget() {
-        Entity entity = Entity.from("caller", "the object");
+        Entity entity = Entity.create("caller", "the object");
         String taint = UUID.randomUUID().toString();
         String target = "the target";
 
@@ -72,7 +72,7 @@ class AssociationCacheTestCase {
 
     @Test
     void testCachingATargetThenEntityWithSameTaintWillPopulateEntityCache() {
-        Entity entity = Entity.from("caller", "the object");
+        Entity entity = Entity.create("caller", "the object");
         String taint = UUID.randomUUID().toString();
         String target = "the target";
 
@@ -89,7 +89,7 @@ class AssociationCacheTestCase {
 
     @Test
     void testCachingATargetThenEntityWithDifferentTaintWillPopulateEntityCacheButNotAssociateTheFirstTarget() {
-        Entity entity = Entity.from("caller", "the object");
+        Entity entity = Entity.create("caller", "the object");
         String taint = UUID.randomUUID().toString();
         String target = "the target";
 
