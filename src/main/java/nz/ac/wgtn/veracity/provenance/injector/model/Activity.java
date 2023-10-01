@@ -1,8 +1,5 @@
 package nz.ac.wgtn.veracity.provenance.injector.model;
 
-import nz.ac.wgtn.veracity.provenance.injector.serializer.InternalId;
-
-import java.net.URI;
 import java.time.Instant;
 import java.util.UUID;
 

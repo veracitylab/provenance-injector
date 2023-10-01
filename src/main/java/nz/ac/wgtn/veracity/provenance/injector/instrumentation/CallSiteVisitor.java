@@ -81,8 +81,8 @@ public class CallSiteVisitor extends ClassVisitor {
      *
      * @param param recorded parameter
      */
-    public static void recordParameter(String entityDesc, String identifier, Object param) {
-        Entity entity = Entity.create(entityDesc, param);
+    public static void recordParameter(String entityType, String identifier, Object param) {
+        Entity entity = Entity.create(entityType, param);
         AssociationCacheRegistry.getCache().cacheEntity(identifier, entity, null);
     }
 
@@ -94,7 +94,7 @@ public class CallSiteVisitor extends ClassVisitor {
      * dynamic methods store a reference to "this" in index 0.
      */
     private void boxAndStore(MethodVisitor visitor, EntityCreation entity, Type type, int index, String identifier) {
-        visitor.visitLdcInsn(entity.getEntity().toString());
+        visitor.visitLdcInsn(entity.getEntity().getFragment());
         visitor.visitLdcInsn(identifier);
 
         switch (type.getSort()) {

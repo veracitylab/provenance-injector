@@ -5,9 +5,7 @@ import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
 import org.json.JSONObject;
 
-import java.net.URI;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -43,8 +41,7 @@ public class JsonProvSerializer implements ProvSerializer {
 
     private JSONObject serializeEntity(Entity entity) {
         JSONObject object = new JSONObject();
-        // Only add the prov:type object if the type representation is valid
-        JsonProvSerializer.getProvType(entity.getType()).ifPresent(type -> object.put("prov:type", type));
+        object.put("prov:type", entity.getType());
         object.put("prov:value", entity.getValue().toString());
 
         return object;
@@ -71,9 +68,5 @@ public class JsonProvSerializer implements ProvSerializer {
         object.put("prov:endTime", activity.getEndTime().toString());
 
         return object;
-    }
-
-    private static Optional<String> getProvType(URI type) {
-        return Optional.ofNullable(type.getRawFragment());
     }
 }

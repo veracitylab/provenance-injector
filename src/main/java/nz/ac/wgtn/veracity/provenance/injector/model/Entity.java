@@ -1,27 +1,20 @@
 package nz.ac.wgtn.veracity.provenance.injector.model;
 
-import java.net.URI;
-
-
 public class Entity {
 
     private final Integer id;
 
-    private final URI type;
+    private final String type;
 
     private final Object value;
 
     private Object target;
 
-    private Entity(URI type, Object value, Object target) {
+    private Entity(String type, Object value, Object target) {
         this.id = System.identityHashCode(value);
         this.value = value;
         this.type = type;
         this.target = target;
-    }
-
-    public static Entity create(String type, Object value) {
-        return new Entity(URI.create(type), value, null);
     }
 
     public Integer getId() {
@@ -32,7 +25,7 @@ public class Entity {
         return this.value;
     }
 
-    public URI getType() {
+    public String getType() {
         return this.type;
     }
 
@@ -42,5 +35,9 @@ public class Entity {
 
     public void setTarget(Object target) {
         this.target = target;
+    }
+
+    public static Entity create(String type, Object value) {
+        return new Entity(type, value, null);
     }
 }
