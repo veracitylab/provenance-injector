@@ -1,15 +1,15 @@
-package nz.ac.wgtn.veracity.provenance.injector.tracker2.jee;
+package nz.ac.wgtn.veracity.provenance.injector.tracker.jee;
 
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
-import nz.ac.wgtn.veracity.provenance.injector.tracker2.ProvenanceTracker;
-import nz.ac.wgtn.veracity.provenance.injector.tracker2.ThreadLocalProvenanceTracker;
+import nz.ac.wgtn.veracity.provenance.injector.tracker.ProvenanceTracker;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
+
 
 /**
  * Abstract class to facilitate provenance tracking in JEE applications.
@@ -19,9 +19,13 @@ import javax.servlet.http.HttpServletResponse;
  * will run in the same thread.
  * @author jens dietrich
  */
-public abstract class ProvenanceTrackerFilter implements Filter  {
+public abstract class ProvenanceTrackerFilter implements Filter {
 
-    protected static final ProvenanceTracker<Invocation> tracker = new ThreadLocalProvenanceTracker<>();
+    protected final ProvenanceTracker<Invocation> tracker;
+
+    protected ProvenanceTrackerFilter(ProvenanceTracker<Invocation> tracker) {
+        this.tracker = tracker;
+    }
 
     /**
      * Specify whether this is an application request, and not a request to get collected provevance info.

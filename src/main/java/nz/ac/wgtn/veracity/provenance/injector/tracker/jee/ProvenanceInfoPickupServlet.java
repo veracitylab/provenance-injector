@@ -1,12 +1,11 @@
-package nz.ac.wgtn.veracity.provenance.injector.tracker2.jee;
+package nz.ac.wgtn.veracity.provenance.injector.tracker.jee;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
-import nz.ac.wgtn.veracity.provenance.injector.tracker2.ProvenanceTracker;
-import nz.ac.wgtn.veracity.provenance.injector.tracker2.ThreadLocalProvenanceTracker;
+import nz.ac.wgtn.veracity.provenance.injector.tracker.ProvenanceTracker;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -17,11 +16,16 @@ import java.util.List;
  */
 public abstract class ProvenanceInfoPickupServlet extends HttpServlet {
 
-    protected static final ProvenanceTracker<Invocation> tracker = new ThreadLocalProvenanceTracker<>();
+    protected final ProvenanceTracker<Invocation> tracker;
+
+    protected ProvenanceInfoPickupServlet(ProvenanceTracker<Invocation> tracker) {
+        this.tracker = tracker;
+    }
+
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        String id = request.getPathInfo();
+        String id = extractId(request);
 
         if (id == null || id.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);

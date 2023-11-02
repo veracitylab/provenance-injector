@@ -1,7 +1,7 @@
 package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
 import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
-import nz.ac.wgtn.veracity.provenance.injector.tracker2.NoopProvenanceTracker;
+import nz.ac.wgtn.veracity.provenance.injector.tracker.NoopProvenanceTracker;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 

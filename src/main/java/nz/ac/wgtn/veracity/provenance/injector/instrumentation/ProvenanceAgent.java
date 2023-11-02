@@ -1,6 +1,6 @@
 package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
-import nz.ac.wgtn.veracity.provenance.injector.tracker2.GlobalProvenanceTracker;
+import nz.ac.wgtn.veracity.provenance.injector.tracker.GlobalProvenanceTracker;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 

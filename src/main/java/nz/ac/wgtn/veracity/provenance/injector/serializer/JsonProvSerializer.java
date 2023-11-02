@@ -3,6 +3,7 @@ package nz.ac.wgtn.veracity.provenance.injector.serializer;
 import nz.ac.wgtn.veracity.provenance.injector.model.Activity;
 import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Collection;
@@ -19,10 +20,15 @@ public class JsonProvSerializer implements ProvSerializer {
     }
 
     @Override
-    public Collection<String> serialize(Collection<Invocation> invocations) {
-        return invocations.stream()
-                .map(inv -> serializeInvocation(inv).toString())
-                .collect(Collectors.toList());
+    public String serialize(Collection<Invocation> invocations) {
+        JSONObject wrapper = new JSONObject();
+        JSONArray items = new JSONArray();
+        invocations.stream()
+                .map(this::serializeInvocation)
+                .forEach(items::put);
+
+        wrapper.put("invocations", items);
+        return wrapper.toString();
     }
 
     private JSONObject serializeInvocation(Invocation invocation) {

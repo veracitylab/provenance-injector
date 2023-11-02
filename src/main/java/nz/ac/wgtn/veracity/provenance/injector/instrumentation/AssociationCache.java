@@ -2,7 +2,7 @@ package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
 import nz.ac.wgtn.veracity.provenance.injector.model.Entity;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
-import nz.ac.wgtn.veracity.provenance.injector.tracker2.ProvenanceTracker;
+import nz.ac.wgtn.veracity.provenance.injector.tracker.ProvenanceTracker;
 
 import java.util.Collections;
 import java.util.HashSet;

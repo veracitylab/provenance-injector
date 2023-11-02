@@ -8,5 +8,5 @@ public interface ProvSerializer {
 
     String serialize(Invocation invocation);
 
-    Collection<String> serialize(Collection<Invocation> invocations);
+    String serialize(Collection<Invocation> invocations);
 }
