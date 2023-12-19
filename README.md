@@ -23,7 +23,9 @@ This project contains the logic to track method invocations that can be mapped t
 
 ### Building
 
-Build the project with `mvn package`, this will create `target/provenance-injector-<version>.jar` .
+First build and locally install the `approv` repo using `git clone git@github.com:veracitylab/approv.git && cd approv/veracity-java-binding-api && mvn install`. This only needs to be done once.
+
+Then build this project (`provenance-injector`) with `mvn package`, which will create `target/provenance-injector-<version>.jar` .
 
 #### Customising Instrumentation
 
