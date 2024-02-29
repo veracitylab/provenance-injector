@@ -23,6 +23,7 @@ public class ProvenanceAgent {
 //            "java/sql"
     );
 
+    public static int DEBUG_testCrossAppCommunication = 43;     // 42 in installed version, 43 in freshly-built
     private static ProvenanceTracker<Invocation> tracker;
 
     private ProvenanceAgent() {
@@ -54,6 +55,12 @@ public class ProvenanceAgent {
      * @param instrumentation instrumentation instance
      */
     private static void install(Instrumentation instrumentation) {
+        //DEBUG
+        System.out.println("Hello world from the ProvenanceAgent!");
+        System.out.println("(in ProvenanceAgent) DEBUG_testCrossAppCommunication=" + DEBUG_testCrossAppCommunication);
+//        System.out.println("jakarta.servlet.Filter.class.getClassLoader()=" + jakarta.servlet.Filter.class.getClassLoader());
+        printClassLoaderChain(ProvenanceAgent.class);
+
         // Construct cache to be used by instrumentation classes
         tracker = new ThreadLocalProvenanceTracker<Invocation>();
         AssociationCache cache = new AssociationCache(tracker);
@@ -84,5 +91,15 @@ public class ProvenanceAgent {
 
     public static ProvenanceTracker<Invocation> getProvenanceTracker() {
         return tracker;
+    }
+
+    //DEBUG
+    static void printClassLoaderChain(Class c) {
+        System.out.println("(Running inside ProvenanceAgent) ClassLoader chain for " + c + ":");
+        for (ClassLoader cl = c.getClassLoader(); cl != null; cl = cl.getClass().getClassLoader()) {
+            Class cc = cl.getClass();
+            System.out.println("loader=" + cl + ", class=" + cc + ", name=" + cc.getName() + ", canonicalName=" + cc.getCanonicalName() + ", simpleName=" + cc.getSimpleName() + ", typeName=" + cc.getTypeName());
+        }
+        System.out.println("(null, meaning the bootstrap ClassLoader)\nThe end.");
     }
 }
