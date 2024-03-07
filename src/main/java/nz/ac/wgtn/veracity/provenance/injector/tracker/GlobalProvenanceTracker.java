@@ -34,7 +34,7 @@ public class GlobalProvenanceTracker implements ProvenanceTracker<Invocation> {
 
     @Override
     public List<Invocation> pickup(String id) {
-        return outbox;
+        return List.copyOf(outbox);     // Don't return the same list that cull() will clear out!
     }
 
     @Override
