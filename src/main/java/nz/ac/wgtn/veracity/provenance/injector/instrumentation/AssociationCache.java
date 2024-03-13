@@ -31,6 +31,7 @@ class AssociationCache {
     }
 
     void cacheInvocation(Invocation invocation, Object target) {
+//        System.out.println("AssociationCache.cacheInvocation(invocation=" + invocation + ", target=" + target + ") called.");   //DEBUG
         int targetIdent = System.identityHashCode(target);
 
         if (targetIdent != 0 && targetsToEntitiesCache.containsKey(targetIdent)) {
@@ -39,6 +40,7 @@ class AssociationCache {
         }
 
         invocationCache.add(invocation);
+//        System.out.println("AssociationCache.cacheInvocation() about to call externalTracker.track().");   //DEBUG
         externalTracker.track(invocation);
     }
 

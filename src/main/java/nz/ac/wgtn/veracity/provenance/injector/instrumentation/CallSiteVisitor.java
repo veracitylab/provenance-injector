@@ -46,6 +46,9 @@ public class CallSiteVisitor extends ClassVisitor {
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         super.visit(version, access, name, signature, superName, interfaces);
         this.currentClass = name;
+        if (name.startsWith("nz")) {
+            System.out.println("CallSiteVisitor: visiting class " + name);  //DEBUG
+        }
     }
 
 

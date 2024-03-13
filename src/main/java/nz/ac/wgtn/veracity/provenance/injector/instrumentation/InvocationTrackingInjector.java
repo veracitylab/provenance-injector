@@ -67,11 +67,27 @@ public class InvocationTrackingInjector extends MethodVisitor {
      */
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+        //DEBUG
+        boolean debugLog = false;
+        if (name.endsWith("dummyStaticMethod")) {
+            debugLog = true;
+            System.out.println("Visiting method instruction in dummyStaticMethod()! owner=" + owner + ", callingClass=" + callingClass);
+        }
         super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
         Set<URI> activities = Bindings.getActivities(owner.replace('/', '.'), name, descriptor);
         Set<EntityCreation> entities = Bindings.getEntityCreations(owner.replace('/', '.'), name, descriptor);
 
+        //DEBUG
+        if (debugLog) {
+            System.out.println("Activities: " + activities);
+            System.out.println("Entities: " + entities);
+        }
+
         if (!activities.isEmpty() && !owner.equals(this.callingClass)) {
+            if (debugLog) {
+                System.out.println("Looks like we're definitely gonna add a call to recordActivity()!");    //DEBUG
+            }
+
             boolean injectDummy = true;
             Type returnType = Type.getReturnType(descriptor);
 
@@ -97,6 +113,10 @@ public class InvocationTrackingInjector extends MethodVisitor {
                     "recordActivity",
                     RECORD_DESCRIPTOR,
                     false);
+
+            if (debugLog) {
+                System.out.println("Definitely added in a call to recordActivity()! injectDummy=" + injectDummy);   //DEBUG
+            }
         }
     }
 
@@ -203,6 +223,7 @@ public class InvocationTrackingInjector extends MethodVisitor {
      * invocation tracker
      */
     public static void recordActivity(Object capturedReturn, String activityTypes) {
+        System.out.println("recordActivity(capturedReturn=" + capturedReturn + ", activityTypes=" + activityTypes + "!");   //DEBUG
         List<Activity> activities = Arrays.stream(activityTypes.split(";"))
                 .map(Activity::create)
                 .collect(Collectors.toList());
