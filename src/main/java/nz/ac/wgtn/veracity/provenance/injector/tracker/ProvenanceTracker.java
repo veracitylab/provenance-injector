@@ -8,6 +8,8 @@ import java.util.List;
  */
 public interface ProvenanceTracker <T> {
 
+    public static final String NO_ACTIVE_REQUEST_ID = "NO_ACTIVE_REQUEST";
+
     /**
      * Starts tracking, and returns a unique session id.
      * This id can be used to pick up provenance records.
