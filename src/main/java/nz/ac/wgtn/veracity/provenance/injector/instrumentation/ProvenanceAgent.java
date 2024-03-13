@@ -1,8 +1,8 @@
 package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
-import nz.ac.wgtn.veracity.provenance.injector.tracker.GlobalProvenanceTracker;
 import nz.ac.wgtn.veracity.provenance.injector.tracker.ProvenanceTracker;
+import nz.ac.wgtn.veracity.provenance.injector.tracker.ThreadLocalProvenanceTracker;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 
@@ -55,7 +55,7 @@ public class ProvenanceAgent {
      */
     private static void install(Instrumentation instrumentation) {
         // Construct cache to be used by instrumentation classes
-        tracker = new GlobalProvenanceTracker();
+        tracker = new ThreadLocalProvenanceTracker<Invocation>();
         AssociationCache cache = new AssociationCache(tracker);
         AssociationCacheRegistry.registerCache(cache);
 
