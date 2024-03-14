@@ -1,7 +1,7 @@
 #!/bin/sh
 
-if [ $# = 0 ]; then
-  echo "Must specify the app jar." >&2
+if [ $# = 0 ] || [ "$1" = "--help" ]; then
+  echo "Usage: $0 path/to/my-spring-boot-app.war" >&2
   exit 1
 fi
 
@@ -13,13 +13,12 @@ echo "APPJARPATH=$APPJARPATH"
 echo "PROVAGENTJARPATH=$PROVAGENTJARPATH"
 echo "EXPLODEDIR=$EXPLODEDIR"
 
-# Explode the provenance agent jar
 (
   cd "$EXPLODEDIR" &&
   jar xf "$PROVAGENTJARPATH" &&
   rm -f META-INF/MANIFEST.MF &&
-  jar xf "$APPJARPATH" META-INF/MANIFEST.MF &&    # jar ...M should make this step unnecessary, but it doesn't
-  jar ufM "$APPJARPATH" * &&
+  jar xf "$APPJARPATH" META-INF/MANIFEST.MF &&
+  jar ufM "$APPJARPATH" * &&    # jar ...M should make the previous step unnecessary, but it doesn't
   (
     echo "Can-Redefine-Classes: true" &&
     echo "Can-Retransform-Classes: true" &&
