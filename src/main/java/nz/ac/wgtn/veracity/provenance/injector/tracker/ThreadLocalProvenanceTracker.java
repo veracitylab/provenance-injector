@@ -1,7 +1,5 @@
 package nz.ac.wgtn.veracity.provenance.injector.tracker;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -18,14 +16,14 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ThreadLocalProvenanceTracker<T> implements ProvenanceTracker<T> {
 
     // Class invariants:
-    // - noActiveRequestTrackedData.get() and trackedData.get() are never null
+    // - noActiveRequestTrackedData.get() and trackedData.get() are never null (@NonNull omitted to minimise deps)
     // - trackedData:
     //     - initially, and after calling finish(), references noActiveRequestTrackedData's contents
     //     - start() allocates a new list
     // - id.get() == null iff trackedData.get() == noActiveRequestTrackedData.get(). Indicates "outside of any request".
 
-    private final ThreadLocal<@NonNull List<T>> noActiveRequestTrackedData = ThreadLocal.withInitial(ArrayList::new);
-    private final ThreadLocal<@NonNull List<T>> trackedData = ThreadLocal.withInitial(noActiveRequestTrackedData::get);
+    private final ThreadLocal</*@NonNull*/ List<T>> noActiveRequestTrackedData = ThreadLocal.withInitial(ArrayList::new);
+    private final ThreadLocal</*@NonNull*/ List<T>> trackedData = ThreadLocal.withInitial(noActiveRequestTrackedData::get);
     private final ThreadLocal<String> id = new ThreadLocal<>();
     private static final AtomicLong ID_GENERATOR = new AtomicLong();
     private final Map<String,List<T>> outbox = Collections.synchronizedMap(new LinkedHashMap<>());
