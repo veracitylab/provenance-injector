@@ -1,6 +1,8 @@
 package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
-import nz.ac.wgtn.veracity.provenance.injector.tracker.GlobalProvenanceTracker;
+import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
+import nz.ac.wgtn.veracity.provenance.injector.tracker.ProvenanceTracker;
+import nz.ac.wgtn.veracity.provenance.injector.tracker.ThreadLocalProvenanceTracker;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 
@@ -20,6 +22,8 @@ public class ProvenanceAgent {
             "java/nio"
 //            "java/sql"
     );
+
+    private static ProvenanceTracker<Invocation> tracker;
 
     private ProvenanceAgent() {
 
@@ -51,7 +55,8 @@ public class ProvenanceAgent {
      */
     private static void install(Instrumentation instrumentation) {
         // Construct cache to be used by instrumentation classes
-        AssociationCache cache = new AssociationCache(new GlobalProvenanceTracker());
+        tracker = new ThreadLocalProvenanceTracker<Invocation>();
+        AssociationCache cache = new AssociationCache(tracker);
         AssociationCacheRegistry.registerCache(cache);
 
         instrumentation.addTransformer(new ClassFileTransformer() {
@@ -75,5 +80,9 @@ public class ProvenanceAgent {
                 return classfileBuffer;
             }
         }, true);
+    }
+
+    public static ProvenanceTracker<Invocation> getProvenanceTracker() {
+        return tracker;
     }
 }
