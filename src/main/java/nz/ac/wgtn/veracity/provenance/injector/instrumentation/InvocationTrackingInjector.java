@@ -228,7 +228,7 @@ public class InvocationTrackingInjector extends MethodVisitor {
      */
     public static void recordActivity(Object capturedReturn, String activityTypes) {
         System.out.println("recordActivity(capturedReturn=" + capturedReturn + (capturedReturn == null ? "" : " (type: " + capturedReturn.getClass() + ")") + ", activityTypes=" + activityTypes + ")! Stacktrace:");   //DEBUG
-        new Throwable().printStackTrace();  //DEBUG
+        new Throwable().printStackTrace(System.out);  //DEBUG
         System.out.println("recordActivity(): end of stacktrace."); //DEBUG
         List<Activity> activities = Arrays.stream(activityTypes.split(";"))
                 .map(Activity::create)

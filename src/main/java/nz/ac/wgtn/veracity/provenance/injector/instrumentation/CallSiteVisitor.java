@@ -87,7 +87,7 @@ public class CallSiteVisitor extends ClassVisitor {
      */
     public static void recordParameter(String entityType, String identifier, Object param) {
         System.out.println("recordParameter(entityType=" + entityType + ", identifier=" + identifier + ", param=" + param + (param == null ? "" : " (type: " + param.getClass() + ")") + ")! Stacktrace:");   //DEBUG
-        new Throwable().printStackTrace();  //DEBUG
+        new Throwable().printStackTrace(System.out);  //DEBUG
         System.out.println("recordParameter(): end of stacktrace."); //DEBUG
         Entity entity = Entity.create(entityType, param);
         AssociationCacheRegistry.getCache().cacheEntity(identifier, entity, null);
