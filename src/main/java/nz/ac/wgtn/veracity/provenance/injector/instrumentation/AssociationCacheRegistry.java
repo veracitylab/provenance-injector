@@ -1,6 +1,6 @@
 package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
-class AssociationCacheRegistry {
+public class AssociationCacheRegistry {
 
     private static volatile AssociationCache cache = null;
 
@@ -10,7 +10,7 @@ class AssociationCacheRegistry {
         cache = newCache;
     }
 
-    static AssociationCache getCache() {
+    public static AssociationCache getCache() {
         if (cache == null) {
             throw new IllegalStateException("No cache is registered");
         }

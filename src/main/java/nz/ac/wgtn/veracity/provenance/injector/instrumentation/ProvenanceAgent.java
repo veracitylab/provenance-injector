@@ -19,7 +19,13 @@ public class ProvenanceAgent {
             "java/lang/",
             "java/util/",
             "java/security/",
-            "java/nio"
+            "java/nio",
+            "nz/ac/wgtn/veracity/approv/jbind/",
+            "nz/ac/wgtn/veracity/provenance/injector/instrumentation/",
+            "nz/ac/wgtn/veracity/provenance/injector/model/",
+            "nz/ac/wgtn/veracity/provenance/injector/serializer/",
+            "nz/ac/wgtn/veracity/provenance/injector/tracker/",
+            "nz/ac/wgtn/veracity/provenance/injector/util/"
 //            "java/sql"
     );
 

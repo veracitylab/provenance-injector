@@ -11,7 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-class AssociationCache {
+public class AssociationCache {
 
     private final ProvenanceTracker<Invocation> externalTracker;
     private final Set<Invocation> invocationCache;
@@ -21,7 +21,7 @@ class AssociationCache {
     private final Map<String, Object> taintedTargetsCache;
 
 
-    AssociationCache(ProvenanceTracker<Invocation> tracker) {
+    public AssociationCache(ProvenanceTracker<Invocation> tracker) {
         this.externalTracker = tracker;
         this.invocationCache = Collections.synchronizedSet(new LinkedHashSet<>());
         this.entityCache = Collections.synchronizedMap(new LinkedHashMap<>());
@@ -44,7 +44,7 @@ class AssociationCache {
         externalTracker.track(invocation);
     }
 
-    void cacheEntity(String entityTaint, Entity entity, Object target) {
+    public void cacheEntity(String entityTaint, Entity entity, Object target) {
         if (entity != null && !taintedTargetsCache.containsKey(entityTaint)) {
             int identity = System.identityHashCode(entity.getValue());
             entityCache.put(identity, entity);
@@ -83,11 +83,11 @@ class AssociationCache {
         }
     }
 
-    Set<Invocation> getInvocationCache() {
+    public Set<Invocation> getInvocationCache() {
         return Set.copyOf(invocationCache);
     }
 
-    Set<Entity> getEntityCache() {
+    public Set<Entity> getEntityCache() {
         return Set.copyOf(entityCache.values());
     }
 
@@ -95,7 +95,7 @@ class AssociationCache {
         return Map.copyOf(entityCache);
     }
 
-    void clear() {
+    public void clear() {
         invocationCache.clear();
         entityCache.clear();
         targetsToEntitiesCache.clear();
