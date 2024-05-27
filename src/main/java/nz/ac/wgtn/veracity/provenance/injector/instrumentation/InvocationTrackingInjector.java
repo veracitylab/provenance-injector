@@ -51,6 +51,10 @@ public class InvocationTrackingInjector extends MethodVisitor {
         this.callingClass = callingClass;
         this.trackMethodReturn = trackMethodReturn;
         this.taint = taint;
+
+        if (trackMethodReturn) {
+            System.out.println("InvocationTrackingInjector ctor called with trackMethodReturn=" + trackMethodReturn + " for class " + callingClass + "!");  //DEBUG
+        }
     }
 
     /**
@@ -223,7 +227,7 @@ public class InvocationTrackingInjector extends MethodVisitor {
      * invocation tracker
      */
     public static void recordActivity(Object capturedReturn, String activityTypes) {
-        System.out.println("recordActivity(capturedReturn=" + capturedReturn + ", activityTypes=" + activityTypes + ")! Stacktrace:");   //DEBUG
+        System.out.println("recordActivity(capturedReturn=" + capturedReturn + (capturedReturn == null ? "" : " (type: " + capturedReturn.getClass() + ")") + ", activityTypes=" + activityTypes + ")! Stacktrace:");   //DEBUG
         new Throwable().printStackTrace();  //DEBUG
         System.out.println("recordActivity(): end of stacktrace."); //DEBUG
         List<Activity> activities = Arrays.stream(activityTypes.split(";"))

@@ -71,6 +71,7 @@ public class CallSiteVisitor extends ClassVisitor {
                     int varTableIndex = entity.getRefIndex();
                     Type arg = argTypes[varTableIndex];
                     boxAndStore(visitor, entity, arg, varTableIndex + offset, taint);
+                    System.out.printf("Inserted call to recordParameter() at start of %s.%s (descriptor: %s).%n", currentClass, name, descriptor);
                 }
             });
         }
@@ -85,6 +86,9 @@ public class CallSiteVisitor extends ClassVisitor {
      * @param param recorded parameter
      */
     public static void recordParameter(String entityType, String identifier, Object param) {
+        System.out.println("recordParameter(entityType=" + entityType + ", identifier=" + identifier + ", param=" + param + (param == null ? "" : " (type: " + param.getClass() + ")") + ")! Stacktrace:");   //DEBUG
+        new Throwable().printStackTrace();  //DEBUG
+        System.out.println("recordParameter(): end of stacktrace."); //DEBUG
         Entity entity = Entity.create(entityType, param);
         AssociationCacheRegistry.getCache().cacheEntity(identifier, entity, null);
     }
