@@ -29,7 +29,7 @@ public class ProvenanceAgent {
 //            "java/sql"
     );
 
-    public static int DEBUG_testCrossAppCommunication = 43;     // 42 in installed version, 43 in freshly-built
+    public static int DEBUG_testCrossAppCommunication = 44;     // 42 in installed version
     private static ProvenanceTracker<Invocation> tracker;
 
     private ProvenanceAgent() {
