@@ -25,7 +25,8 @@ public class ProvenanceAgent {
             "nz/ac/wgtn/veracity/provenance/injector/model/",
             "nz/ac/wgtn/veracity/provenance/injector/serializer/",
             "nz/ac/wgtn/veracity/provenance/injector/tracker/",
-            "nz/ac/wgtn/veracity/provenance/injector/util/"
+            "nz/ac/wgtn/veracity/provenance/injector/util/",
+            "java/net/URLClassLoader"
 //            "java/sql"
     );
 
