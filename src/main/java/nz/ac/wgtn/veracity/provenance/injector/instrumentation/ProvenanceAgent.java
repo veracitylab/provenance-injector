@@ -76,6 +76,7 @@ public class ProvenanceAgent {
         instrumentation.addTransformer(new ClassFileTransformer() {
             @Override
             public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
+                System.out.printf("transform(loader=%s, className=%s, %s) called.%n", loader.getName(), className, classBeingRedefined == null ? "LOAD" : "REDEFINITION!");
                 if(ignorePackages.stream().parallel().anyMatch(className::startsWith)) {
                     return null;
                 }

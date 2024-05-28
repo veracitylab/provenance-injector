@@ -13,6 +13,7 @@ import org.objectweb.asm.Type;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_BOOL;
 import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_BYTE;
@@ -46,7 +47,7 @@ public class CallSiteVisitor extends ClassVisitor {
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         super.visit(version, access, name, signature, superName, interfaces);
         this.currentClass = name;
-        if (name.startsWith("nz")) {
+        if (name.startsWith("nz") || name.endsWith("/URL")) {
             System.out.println("CallSiteVisitor: visiting class " + name);  //DEBUG
         }
     }
@@ -59,6 +60,10 @@ public class CallSiteVisitor extends ClassVisitor {
         AtomicBoolean captureReturnValue = new AtomicBoolean(false);
 
         Set<EntityCreation> createEntities = Bindings.getEntityCreations(this.currentClass.replace('/', '.'), name, descriptor);
+
+        if (currentClass.startsWith("nz") || currentClass.endsWith("/URL")) {
+            System.out.printf("visitMethod(name=%s, descriptor=%s) in class %s. createEntities=[%s].%n", name, descriptor, currentClass, createEntities.stream().map((EntityCreation ec) -> ec.getEntity().toString()).collect(Collectors.joining(", ")));
+        }
 
         if (!createEntities.isEmpty()) {
             createEntities.forEach(entity -> {
