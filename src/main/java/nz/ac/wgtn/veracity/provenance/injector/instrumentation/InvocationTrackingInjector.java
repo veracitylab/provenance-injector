@@ -41,14 +41,18 @@ public class InvocationTrackingInjector extends MethodVisitor {
     private static final String RECORD_DESCRIPTOR = "(Ljava/lang/Object;Ljava/lang/String;)V";
     private final MethodVisitor visitor;
     private final String callingClass;
+    private final String ownMethodName;     //DEBUG
+    private final String ownMethodDescriptor;   //DEBUG
     private final boolean trackMethodReturn;
 
     private final String taint;
 
-    public InvocationTrackingInjector(MethodVisitor visitor, String callingClass, boolean trackMethodReturn, String taint) {
+    public InvocationTrackingInjector(MethodVisitor visitor, String callingClass, String ownMethodName, String ownMethodDescriptor, boolean trackMethodReturn, String taint) {
         super(Opcodes.ASM9, visitor);
         this.visitor = visitor;
         this.callingClass = callingClass;
+        this.ownMethodName = ownMethodName;
+        this.ownMethodDescriptor = ownMethodDescriptor;
         this.trackMethodReturn = trackMethodReturn;
         this.taint = taint;
 
@@ -75,7 +79,7 @@ public class InvocationTrackingInjector extends MethodVisitor {
         boolean debugLog = false;
         if (name.endsWith("dummyStaticMethod")) {
             debugLog = true;
-            System.out.println("Visiting method instruction in dummyStaticMethod()! owner=" + owner + ", callingClass=" + callingClass);
+            System.out.println("Visiting method call instruction in dummyStaticMethod()! Call is to " + owner + "." + name + "() with desc " + descriptor + ", callingClass=" + callingClass);
         }
         super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
         Set<URI> activities = Bindings.getActivities(owner.replace('/', '.'), name, descriptor);
@@ -97,7 +101,7 @@ public class InvocationTrackingInjector extends MethodVisitor {
 
             if (!returnType.equals(Type.VOID_TYPE) && !entities.isEmpty()) {
 
-                System.out.printf("DEBUG: Called method: %s%n", descriptor);
+                System.out.printf("DEBUG: Called method: %s (desc: %s)%n", name, descriptor);
                 System.out.printf("DEBUG: Non void type of: %s%n", returnType);
 
                 boxReturnValue(visitor, returnType);
@@ -177,6 +181,8 @@ public class InvocationTrackingInjector extends MethodVisitor {
                 "(Ljava/lang/Object;Ljava/lang/String;)V",
                 false
         );
+
+        System.out.printf("Inserted call to captureTarget() before RETURN inside %s.%s (descriptor: %s).%n", callingClass, ownMethodName, ownMethodDescriptor);
     }
 
     private void boxReturnValue(MethodVisitor visitor, Type returnType) {
@@ -246,7 +252,7 @@ public class InvocationTrackingInjector extends MethodVisitor {
      */
     public static void captureTarget(Object target, String taint) {
         AssociationCacheRegistry.getCache().cacheEntity(taint, null, target);
-        System.out.printf("DEBUG: Got target of type: %s%n", target.getClass().getName());
-        System.out.printf("DEBUG: Return value is: %s%n", target);
+        System.out.printf("DEBUG: captureTarget(): Got target of type: %s%n", target.getClass().getName());
+        System.out.printf("DEBUG: captureTarget(): Return value is: %s%n", target);
     }
 }

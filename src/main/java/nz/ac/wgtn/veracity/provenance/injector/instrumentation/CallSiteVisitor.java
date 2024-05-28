@@ -76,7 +76,7 @@ public class CallSiteVisitor extends ClassVisitor {
             });
         }
 
-        return new InvocationTrackingInjector(visitor, this.currentClass, captureReturnValue.get(), taint);
+        return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor, captureReturnValue.get(), taint);
     }
 
 
