@@ -73,6 +73,17 @@ public class ProvenanceAgent {
         AssociationCache cache = new AssociationCache(tracker);
         AssociationCacheRegistry.registerCache(cache);
 
+        //DEBUG
+        System.out.println("List of already-loaded classes at agent start time:");
+        Class[] alreadyLoadedClasses = instrumentation.getAllLoadedClasses();
+        for (Class c: alreadyLoadedClasses) {
+//            System.out.println("Already loaded class: " + c.getName() + " (loader: " + c.getClassLoader().getName() + ")");
+            String classLoaderName = c.getClassLoader() == null ? "null" : c.getClassLoader().getName();
+            System.out.println("Already loaded class: " + c.getName() + " (loader: " + classLoaderName + ")");
+//            System.out.println("Already loaded class: " + c.getName());
+        }
+        System.out.println("End of list of already-loaded classes at agent start time.");
+
         instrumentation.addTransformer(new ClassFileTransformer() {
             @Override
             public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
