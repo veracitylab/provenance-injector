@@ -8,6 +8,7 @@ import org.objectweb.asm.ClassWriter;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
+import java.lang.instrument.UnmodifiableClassException;
 import java.security.ProtectionDomain;
 import java.util.Collection;
 import java.util.Set;
@@ -76,10 +77,14 @@ public class ProvenanceAgent {
         //DEBUG
         System.out.println("List of already-loaded classes at agent start time:");
         Class[] alreadyLoadedClasses = instrumentation.getAllLoadedClasses();
+        boolean wasUrlAlreadyLoaded = false;
         for (Class c: alreadyLoadedClasses) {
-//            System.out.println("Already loaded class: " + c.getName() + " (loader: " + c.getClassLoader().getName() + ")");
             String classLoaderName = c.getClassLoader() == null ? "null" : c.getClassLoader().getName();
             System.out.println("Already loaded class: " + c.getName() + " (loader: " + classLoaderName + ", modifiable=" + instrumentation.isModifiableClass(c) + ")");
+            if (c.getName() == "java.net.URL") {
+                System.out.println("FOUND java.net.URL ALREADY LOADED!");
+                wasUrlAlreadyLoaded = true;
+            }
         }
         System.out.println("End of list of already-loaded classes at agent start time.");
 
@@ -105,6 +110,20 @@ public class ProvenanceAgent {
                 return classfileBuffer;
             }
         }, true);
+
+        if (wasUrlAlreadyLoaded) {
+            System.out.println("Will retransform java.net.URL..."); //DEBUG
+            Class cls;
+            try {
+                cls = Class.forName("java.net.URL");
+                instrumentation.retransformClasses(cls);
+                System.out.println("We appear to have successfully retransformed java.net.URL :)"); //DEBUG
+            } catch (ClassNotFoundException e) {
+                System.out.println("Got ClassNotFoundException when trying to look up class java.net.URL by name!");
+            } catch (UnmodifiableClassException e) {
+                System.out.println("Got UnmodifiableClassException when trying to retransform java.net.URL!");
+            }
+        }
     }
 
     public static ProvenanceTracker<Invocation> getProvenanceTracker() {
