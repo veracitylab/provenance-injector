@@ -34,6 +34,7 @@ public class ThreadLocalProvenanceTracker<T> implements ProvenanceTracker<T> {
         }
 
         String generatedId = "" + ID_GENERATOR.incrementAndGet();
+        System.out.println("ThreadLocalProvenanceTracker.start() called! Returning id " + generatedId);  //DEBUG
         this.id.set(generatedId);
         this.trackedData.set(new ArrayList<>());
         return generatedId;
@@ -49,6 +50,7 @@ public class ThreadLocalProvenanceTracker<T> implements ProvenanceTracker<T> {
      * TODO: There is currently no way to determine which threads have outstanding non-request invocations.
      */
     public void finish() {
+        System.out.println("ThreadLocalProvenanceTracker.finish() called for ID " + getNiceId() + "! Will move " + trackedData.get().size() + " invocations to outbox.");  //DEBUG
         this.outbox.put(getNiceId(), Collections.unmodifiableList(trackedData.get()));
         if (trackedData.get() == noActiveRequestTrackedData.get()) {
             // We are outside of any request.
@@ -66,7 +68,9 @@ public class ThreadLocalProvenanceTracker<T> implements ProvenanceTracker<T> {
      * @param data
      */
     public void track(T data) {
+        System.out.println("ThreadLocalProvenanceTracker.track(" + data + ") called for ID " + getNiceId() + "!");  //DEBUG
         trackedData.get().add(data);
+        System.out.println("ThreadLocalProvenanceTracker.track(): There are now " + trackedData.get().size() + " invocations tracked so far for ID " + getNiceId() + ".");  //DEBUG
     }
 
     public List<T> pickup(String id) {
@@ -74,6 +78,7 @@ public class ThreadLocalProvenanceTracker<T> implements ProvenanceTracker<T> {
         if (data==null) {
             throw new IllegalArgumentException("no data available for key " + id);
         }
+        System.out.println("ThreadLocalProvenanceTracker.pickup(" + id + ") called! Will send " + data.size() + " invocations back.");  //DEBUG
         return data;
     }
 
@@ -82,6 +87,7 @@ public class ThreadLocalProvenanceTracker<T> implements ProvenanceTracker<T> {
      * Return true if data was cleared, false otherwise.
      */
     public boolean cull(String id) {
+        System.out.println("ThreadLocalProvenanceTracker.cull(" + id + ") called! Removing " + (outbox.containsKey(id) ? "" + outbox.get(id).size() : "<NULL>") + " invocations from outbox.");  //DEBUG
         return outbox.remove(id)!=null;
     }
 

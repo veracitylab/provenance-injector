@@ -13,6 +13,7 @@ import org.objectweb.asm.Type;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_BOOL;
 import static nz.ac.wgtn.veracity.provenance.injector.util.Consts.C_BYTE;
@@ -46,6 +47,9 @@ public class CallSiteVisitor extends ClassVisitor {
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         super.visit(version, access, name, signature, superName, interfaces);
         this.currentClass = name;
+        if (name.startsWith("nz") || name.endsWith("/URL")) {
+            System.out.println("CallSiteVisitor: visiting class " + name);  //DEBUG
+        }
     }
 
 
@@ -56,6 +60,10 @@ public class CallSiteVisitor extends ClassVisitor {
         AtomicBoolean captureReturnValue = new AtomicBoolean(false);
 
         Set<EntityCreation> createEntities = Bindings.getEntityCreations(this.currentClass.replace('/', '.'), name, descriptor);
+
+        if (currentClass.startsWith("nz") || currentClass.endsWith("/URL")) {
+            System.out.printf("visitMethod(name=%s, descriptor=%s) in class %s. createEntities=[%s].%n", name, descriptor, currentClass, createEntities.stream().map((EntityCreation ec) -> ec.getEntity().toString()).collect(Collectors.joining(", ")));
+        }
 
         if (!createEntities.isEmpty()) {
             createEntities.forEach(entity -> {
@@ -68,11 +76,12 @@ public class CallSiteVisitor extends ClassVisitor {
                     int varTableIndex = entity.getRefIndex();
                     Type arg = argTypes[varTableIndex];
                     boxAndStore(visitor, entity, arg, varTableIndex + offset, taint);
+                    System.out.printf("Inserted call to recordParameter() at start of %s.%s (descriptor: %s).%n", currentClass, name, descriptor);
                 }
             });
         }
 
-        return new InvocationTrackingInjector(visitor, this.currentClass, captureReturnValue.get(), taint);
+        return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor, captureReturnValue.get(), taint);
     }
 
 
@@ -82,6 +91,9 @@ public class CallSiteVisitor extends ClassVisitor {
      * @param param recorded parameter
      */
     public static void recordParameter(String entityType, String identifier, Object param) {
+        System.out.println("recordParameter(entityType=" + entityType + ", identifier=" + identifier + ", param=" + param + (param == null ? "" : " (type: " + param.getClass() + ")") + ")! Stacktrace:");   //DEBUG
+        new Throwable().printStackTrace(System.out);  //DEBUG
+        System.out.println("recordParameter(): end of stacktrace."); //DEBUG
         Entity entity = Entity.create(entityType, param);
         AssociationCacheRegistry.getCache().cacheEntity(identifier, entity, null);
     }
