@@ -2,6 +2,7 @@ package nz.ac.wgtn.veracity.provenance.injector.instrumentation;
 
 import nz.ac.wgtn.veracity.approv.jbind.Bindings;
 import nz.ac.wgtn.veracity.approv.jbind.EntityCreation;
+import nz.ac.wgtn.veracity.approv.jbind.EntityRef;
 import nz.ac.wgtn.veracity.provenance.injector.model.Activity;
 import nz.ac.wgtn.veracity.provenance.injector.model.Invocation;
 import org.objectweb.asm.MethodVisitor;
@@ -44,16 +45,18 @@ public class InvocationTrackingInjector extends MethodVisitor {
     private final String ownMethodName;     //DEBUG
     private final String ownMethodDescriptor;   //DEBUG
     private final boolean trackMethodReturn;
+    private final EntityRef targetEntityRef;    // Only used if trackMethodReturn == true; doesn't yet handle EntityRef.ARG
 
     private final String taint;
 
-    public InvocationTrackingInjector(MethodVisitor visitor, String callingClass, String ownMethodName, String ownMethodDescriptor, boolean trackMethodReturn, String taint) {
+    public InvocationTrackingInjector(MethodVisitor visitor, String callingClass, String ownMethodName, String ownMethodDescriptor, boolean trackMethodReturn, EntityRef targetEntityRef, String taint) {
         super(Opcodes.ASM9, visitor);
         this.visitor = visitor;
         this.callingClass = callingClass;
         this.ownMethodName = ownMethodName;
         this.ownMethodDescriptor = ownMethodDescriptor;
         this.trackMethodReturn = trackMethodReturn;
+        this.targetEntityRef = targetEntityRef;
         this.taint = taint;
 
         if (trackMethodReturn) {
@@ -142,31 +145,48 @@ public class InvocationTrackingInjector extends MethodVisitor {
             return;
         }
 
-        switch (opcode) {
-            case Opcodes.LRETURN:
-                visitor.visitInsn(Opcodes.DUP2);
-                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_LONG, M_VO, D_LONG, false);
-                invokeMethodArgumentCollector(visitor);
-                break;
-            case Opcodes.DRETURN:
-                visitor.visitInsn(Opcodes.DUP2);
-                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_DOUBLE, M_VO, D_DOUBLE, false);
-                invokeMethodArgumentCollector(visitor);
-                break;
-            case Opcodes.IRETURN:
-                visitor.visitInsn(Opcodes.DUP);
-                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_INTEGER, M_VO, D_INTEGER, false);
-                invokeMethodArgumentCollector(visitor);
-                break;
-            case Opcodes.FRETURN:
-                visitor.visitInsn(Opcodes.DUP);
-                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_FLOAT, M_VO, D_FLOAT, false);
-                invokeMethodArgumentCollector(visitor);
-                break;
-            case Opcodes.ARETURN:
-                visitor.visitInsn(Opcodes.DUP);
-                invokeMethodArgumentCollector(visitor);
-                break;
+        if (targetEntityRef == EntityRef.RETURN) {
+            switch (opcode) {
+                case Opcodes.LRETURN:
+                    visitor.visitInsn(Opcodes.DUP2);
+                    visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_LONG, M_VO, D_LONG, false);
+                    invokeMethodArgumentCollector(visitor);
+                    break;
+                case Opcodes.DRETURN:
+                    visitor.visitInsn(Opcodes.DUP2);
+                    visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_DOUBLE, M_VO, D_DOUBLE, false);
+                    invokeMethodArgumentCollector(visitor);
+                    break;
+                case Opcodes.IRETURN:
+                    visitor.visitInsn(Opcodes.DUP);
+                    visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_INTEGER, M_VO, D_INTEGER, false);
+                    invokeMethodArgumentCollector(visitor);
+                    break;
+                case Opcodes.FRETURN:
+                    visitor.visitInsn(Opcodes.DUP);
+                    visitor.visitMethodInsn(Opcodes.INVOKESTATIC, C_FLOAT, M_VO, D_FLOAT, false);
+                    invokeMethodArgumentCollector(visitor);
+                    break;
+                case Opcodes.ARETURN:
+                    visitor.visitInsn(Opcodes.DUP);
+                    invokeMethodArgumentCollector(visitor);
+                    break;
+            }
+        } else if (targetEntityRef == EntityRef.THIS) {
+            switch (opcode) {
+                case Opcodes.LRETURN:
+                case Opcodes.DRETURN:
+                case Opcodes.IRETURN:
+                case Opcodes.FRETURN:
+                case Opcodes.ARETURN:
+                case Opcodes.RETURN:        // This is what a constructor uses to return
+                    visitor.visitVarInsn(Opcodes.ALOAD, 0);
+                    invokeMethodArgumentCollector(visitor);
+                    System.out.println("The just-inserted call to captureTarget() was for 'this', not the return value!");   //DEBUG
+                    break;
+            }
+        } else {
+            throw new RuntimeException("Not yet handling EntityRef.ARG");
         }
 
         super.visitInsn(opcode);

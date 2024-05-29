@@ -65,8 +65,9 @@ public class CallSiteVisitor extends ClassVisitor {
             System.out.printf("visitMethod(name=%s, descriptor=%s) in class %s. createEntities=[%s].%n", name, descriptor, currentClass, createEntities.stream().map((EntityCreation ec) -> ec.getEntity().toString()).collect(Collectors.joining(", ")));
         }
 
+        EntityRef entityRefType = EntityRef.RETURN;        //HACK: Not handling the fact that there could be multiple entities so multiple types
         if (!createEntities.isEmpty()) {
-            createEntities.forEach(entity -> {
+            for (EntityCreation entity: createEntities) {
                 if (entity.getSourceRef() == EntityRef.ARG) {
                     Type[] argTypes = Type.getArgumentTypes(descriptor);
 
@@ -77,19 +78,20 @@ public class CallSiteVisitor extends ClassVisitor {
                     boxAndStore(visitor, entity, arg, varTableIndex + offset, taint);
                     System.out.printf("Inserted call to recordParameter() at start of %s.%s (descriptor: %s). Taint/identifier: %s%n", currentClass, name, descriptor, taint);
 
-                    if (entity.getTargetRef() == EntityRef.RETURN) {
+                    entityRefType = entity.getTargetRef();
+//                    if (entity.getTargetRef() == EntityRef.RETURN) {
                         captureReturnValue.set(true);
-                    } else if (entity.getTargetRef() == EntityRef.THIS) {
-                        visitor.visitVarInsn(Opcodes.ALOAD, 0);     // Load "this"
-                        visitor.visitLdcInsn(taint);
-                        InvocationTrackingInjector.injectCallToCaptureTarget(visitor);
-                        System.out.printf("Inserted call to captureTarget() just after recordParameter() insertion in %s.%s (descriptor: %s) to capture 'this'. Taint/identifier: %s%n", currentClass, name, descriptor, taint);
-                    }
+//                    } else if (entity.getTargetRef() == EntityRef.THIS) {
+//                        visitor.visitVarInsn(Opcodes.ALOAD, 0);     // Load "this"
+//                        visitor.visitLdcInsn(taint);
+//                        InvocationTrackingInjector.injectCallToCaptureTarget(visitor);
+//                        System.out.printf("Inserted call to captureTarget() just after recordParameter() insertion in %s.%s (descriptor: %s) to capture 'this'. Taint/identifier: %s%n", currentClass, name, descriptor, taint);
+//                    }
                 }
-            });
+            }
         }
 
-        return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor, captureReturnValue.get(), taint);
+        return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor, captureReturnValue.get(), entityRefType, taint);
     }
 
 
