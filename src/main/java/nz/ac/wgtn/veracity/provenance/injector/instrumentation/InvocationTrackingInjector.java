@@ -174,6 +174,12 @@ public class InvocationTrackingInjector extends MethodVisitor {
 
     private void invokeMethodArgumentCollector(MethodVisitor visitor) {
         visitor.visitLdcInsn(this.taint);
+        injectCallToCaptureTarget(visitor);
+
+        System.out.printf("Inserted call to captureTarget() before RETURN inside %s.%s (descriptor: %s). Taint/identifier: %s%n", callingClass, ownMethodName, ownMethodDescriptor, taint);
+    }
+
+    static public void injectCallToCaptureTarget(MethodVisitor visitor) {
         visitor.visitMethodInsn(
                 Opcodes.INVOKESTATIC,
                 InvocationTrackingInjector.class.getName().replace('.', '/'),
@@ -181,8 +187,6 @@ public class InvocationTrackingInjector extends MethodVisitor {
                 "(Ljava/lang/Object;Ljava/lang/String;)V",
                 false
         );
-
-        System.out.printf("Inserted call to captureTarget() before RETURN inside %s.%s (descriptor: %s). Taint/identifier: %s%n", callingClass, ownMethodName, ownMethodDescriptor, taint);
     }
 
     private void boxReturnValue(MethodVisitor visitor, Type returnType) {

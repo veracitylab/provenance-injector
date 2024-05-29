@@ -68,7 +68,6 @@ public class CallSiteVisitor extends ClassVisitor {
         if (!createEntities.isEmpty()) {
             createEntities.forEach(entity -> {
                 if (entity.getSourceRef() == EntityRef.ARG) {
-                    captureReturnValue.set(true);
                     Type[] argTypes = Type.getArgumentTypes(descriptor);
 
                     // For index boosting non-static invocations
@@ -77,6 +76,15 @@ public class CallSiteVisitor extends ClassVisitor {
                     Type arg = argTypes[varTableIndex];
                     boxAndStore(visitor, entity, arg, varTableIndex + offset, taint);
                     System.out.printf("Inserted call to recordParameter() at start of %s.%s (descriptor: %s). Taint/identifier: %s%n", currentClass, name, descriptor, taint);
+
+                    if (entity.getTargetRef() == EntityRef.RETURN) {
+                        captureReturnValue.set(true);
+                    } else if (entity.getTargetRef() == EntityRef.THIS) {
+                        visitor.visitVarInsn(Opcodes.ALOAD, 0);     // Load "this"
+                        visitor.visitLdcInsn(taint);
+                        InvocationTrackingInjector.injectCallToCaptureTarget(visitor);
+                        System.out.printf("Inserted call to captureTarget() just after recordParameter() insertion in %s.%s (descriptor: %s) to capture 'this'. Taint/identifier: %s%n", currentClass, name, descriptor, taint);
+                    }
                 }
             });
         }
