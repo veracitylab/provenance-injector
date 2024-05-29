@@ -76,7 +76,7 @@ public class CallSiteVisitor extends ClassVisitor {
                     int varTableIndex = entity.getRefIndex();
                     Type arg = argTypes[varTableIndex];
                     boxAndStore(visitor, entity, arg, varTableIndex + offset, taint);
-                    System.out.printf("Inserted call to recordParameter() at start of %s.%s (descriptor: %s).%n", currentClass, name, descriptor);
+                    System.out.printf("Inserted call to recordParameter() at start of %s.%s (descriptor: %s). Taint/identifier: %s%n", currentClass, name, descriptor, taint);
                 }
             });
         }

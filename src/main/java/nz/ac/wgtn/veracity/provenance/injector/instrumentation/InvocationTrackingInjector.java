@@ -182,7 +182,7 @@ public class InvocationTrackingInjector extends MethodVisitor {
                 false
         );
 
-        System.out.printf("Inserted call to captureTarget() before RETURN inside %s.%s (descriptor: %s).%n", callingClass, ownMethodName, ownMethodDescriptor);
+        System.out.printf("Inserted call to captureTarget() before RETURN inside %s.%s (descriptor: %s). Taint/identifier: %s%n", callingClass, ownMethodName, ownMethodDescriptor, taint);
     }
 
     private void boxReturnValue(MethodVisitor visitor, Type returnType) {
