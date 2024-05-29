@@ -67,13 +67,13 @@ public class CallSiteVisitor extends ClassVisitor {
 
         if (!createEntities.isEmpty()) {
             createEntities.forEach(entity -> {
-                if (entity.getRef() == EntityRef.ARG) {
+                if (entity.getSourceRef() == EntityRef.ARG) {
                     captureReturnValue.set(true);
                     Type[] argTypes = Type.getArgumentTypes(descriptor);
 
                     // For index boosting non-static invocations
                     int offset = (access & Opcodes.ACC_STATIC) != 0 ? 0 : 1;
-                    int varTableIndex = entity.getRefIndex();
+                    int varTableIndex = entity.getSourceRefIndex();
                     Type arg = argTypes[varTableIndex];
                     boxAndStore(visitor, entity, arg, varTableIndex + offset, taint);
                     System.out.printf("Inserted call to recordParameter() at start of %s.%s (descriptor: %s). Taint/identifier: %s%n", currentClass, name, descriptor, taint);
