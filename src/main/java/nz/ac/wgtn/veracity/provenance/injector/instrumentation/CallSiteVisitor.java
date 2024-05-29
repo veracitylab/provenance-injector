@@ -57,7 +57,7 @@ public class CallSiteVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor visitor = super.visitMethod(access, name, descriptor, signature, exceptions);
         String taint = UUID.randomUUID().toString();
-        AtomicBoolean captureReturnValue = new AtomicBoolean(false);
+        boolean captureReturnValue = false;
 
         Set<EntityCreation> createEntities = Bindings.getEntityCreations(this.currentClass.replace('/', '.'), name, descriptor);
 
@@ -65,23 +65,26 @@ public class CallSiteVisitor extends ClassVisitor {
             System.out.printf("visitMethod(name=%s, descriptor=%s) in class %s. createEntities=[%s].%n", name, descriptor, currentClass, createEntities.stream().map((EntityCreation ec) -> ec.getEntity().toString()).collect(Collectors.joining(", ")));
         }
 
+        EntityRef returnEntityRefType = EntityRef.RETURN;        //HACK: Not handling the fact that there could be multiple entities so multiple types
         if (!createEntities.isEmpty()) {
-            createEntities.forEach(entity -> {
-                if (entity.getRef() == EntityRef.ARG) {
-                    captureReturnValue.set(true);
+            for (EntityCreation entity: createEntities) {
+                if (entity.getSourceRef() == EntityRef.ARG) {
                     Type[] argTypes = Type.getArgumentTypes(descriptor);
 
                     // For index boosting non-static invocations
                     int offset = (access & Opcodes.ACC_STATIC) != 0 ? 0 : 1;
-                    int varTableIndex = entity.getRefIndex();
+                    int varTableIndex = entity.getSourceRefIndex();
                     Type arg = argTypes[varTableIndex];
                     boxAndStore(visitor, entity, arg, varTableIndex + offset, taint);
-                    System.out.printf("Inserted call to recordParameter() at start of %s.%s (descriptor: %s).%n", currentClass, name, descriptor);
+                    System.out.printf("Inserted call to recordParameter() at start of %s.%s (descriptor: %s). Taint/identifier: %s%n", currentClass, name, descriptor, taint);
+
+                    returnEntityRefType = entity.getTargetRef();
+                    captureReturnValue = true;
                 }
-            });
+            }
         }
 
-        return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor, captureReturnValue.get(), taint);
+        return new InvocationTrackingInjector(visitor, this.currentClass, name, descriptor, captureReturnValue, returnEntityRefType, taint);
     }
 
 
