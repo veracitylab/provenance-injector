@@ -100,7 +100,10 @@ public class InvocationTrackingInjector extends MethodVisitor {
             }
 
             boolean injectDummy = true;
-            Type returnType = Type.getReturnType(descriptor);
+
+            // Constructors (which are named "<init>") technically have void return type, but the top-of-stack will
+            // nevertheless contain the target object that we want (due to an earlier DUP).
+            Type returnType = name.equals("<init>") ? Type.getType(Object.class) : Type.getReturnType(descriptor);
 
             if (!returnType.equals(Type.VOID_TYPE) && !entities.isEmpty()) {
 
